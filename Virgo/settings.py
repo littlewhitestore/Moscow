@@ -26,7 +26,7 @@ SECRET_KEY = 'rarcan!uux&6c)462-dc&bcju%9stz3ft#g(!)q!9tor6k4w8h'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '10.211.55.11'
+    '*'
 ]
 
 
@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'api',
+    'common',
 ]
 
 MIDDLEWARE = [
