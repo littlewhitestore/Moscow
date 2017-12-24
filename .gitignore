@@ -8,6 +8,7 @@
 *.pyc
 tmp/
 log/
+static/img/
 *.log
 
 local_settings*
@@ -22,18 +23,4 @@ env*
 *.rdb
 *.db
 *.pm
-.ropeproject/
-node_modules/*
-webpack.config.js
-celerybeat-schedule
-gulpfile.js
-package.json
-analysis_csv/
 
-capric.py
-
-testDemo/
-
-apidoc/doc
-
-blueberry/service/local/liuzhangpei.py

@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{% block title %}小白店商家管理后台{% endblock %}</title>
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="stylesheet" href="{% static "bootstrap4/css/bootstrap.min.css" %}">
+		
+	</head>
+	<body> 
+	    
+        <!-- top header -->
+        <header>
+            <nav class="navbar navbar-expand-md navbar-dark" role="navigation" style="background-color: #46a0af;">
+                <a class="navbar-brand" href="#">小白店</a>
+            </nav>
+        </header>
+		
+	    <!-- left menu -->
+        <div class="container-fluid">
+            <div class="row">
+                <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Overview <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Reports</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+	    
+        
+        <!--right content -->
+		{% block right_content %}
+		{% endblock %}
+
+		<!-- content bottom copyright -->
+	</body>
+    <script src="{{STATIC_URL}}bootstrap4/js/bootstrap.js"></script>
+</html>
