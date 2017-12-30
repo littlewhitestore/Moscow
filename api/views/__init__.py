@@ -89,8 +89,10 @@ class Cart(View):
                         'count': 2, 
                         'price': 17.00, 
                         'image': generate_image_url('20171224144042-4-1_dmjbs0_dmjbs0'),
+                        'selected': 1
                     }
-                ]
+                ],
+                'total_amount': 0.01
             }
         }
         return JsonResponse(res)
