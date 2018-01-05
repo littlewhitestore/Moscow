@@ -9,8 +9,3 @@ from .goods import *
 from .home import *
 from .user import *
 
-class HelloWorld(View):
-    
-    def get(self, request):
-        return HttpResponse("hello world!")
-

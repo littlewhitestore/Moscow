@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views import View 
+
+class HelloWorld(View):
+    
+    def get(self, request):
+        return HttpResponse("hello world!")
 
 class Home(View):
     
