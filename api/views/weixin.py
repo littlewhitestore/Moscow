@@ -72,7 +72,18 @@ class WXPayment(object):
         ret = param_str.upper()
         return ret
 
-    def get_prepay_id(self, total_fee, body, openid, notify_url):
+    
+    def settlement(self, total_fee, body, openid, notify_url):
+        prepay_id = self.__get_prepay_id(total_fee, body, openid, notify_url)
+        ret = {
+            'timestamp': '',
+            'nonce_str': self.__get_nonce_str(),
+            'package': 'prepay_id=%s'%prepay_id,
+            'sign_type': 'MD5',
+        }
+
+
+    def __get_prepay_id(self, total_fee, body, openid, notify_url):
         data = {
             "appid": settings.WECHAT_APP_ID,
             "mch_id": settings.WXPAY_MCH_ID, 

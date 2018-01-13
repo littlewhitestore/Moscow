@@ -40,7 +40,6 @@ class Settlement(View):
             'ooE4V0QzwSVR4AekmJI4b8nqLFi0',
             '127.0.0.1'
         )
-        print prepay_id 
 
         res = {
             'cart_info': {
