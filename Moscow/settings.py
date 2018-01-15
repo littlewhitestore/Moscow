@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'Moscow.wsgi.application'
 
 DATABASES = {
     'default': {
-        'NAME': 'virgo',
+        'NAME': 'moscow',
         'ENGINE': 'django.db.backends.mysql',
         'HOST': 'localhost',
         'PORT': '3306',
