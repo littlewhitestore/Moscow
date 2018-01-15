@@ -36,3 +36,12 @@ class User(models.Model):
             pass
         return None
 
+    @classmethod
+    def fetch_user_by_session(cls, session):
+        try:
+            obj = cls.objects.get(session=session)
+            return obj
+        except Exception:
+            pass
+        return None
+
