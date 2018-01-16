@@ -87,7 +87,7 @@ DATABASES = {
         'PORT': '3306',
         'USER': 'root',
         'PASSWORD': '123456',
-        'OPTIONS': {'init_command': 'SET storage_engine=InnoDB'},
+        'OPTIONS': {'init_command': 'SET default_storage_engine=InnoDB'},
         'CHARSET': 'utf8',
         'COLLATION': 'utf8_general_ci',
     }
