@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'common',
-    'web_merchant',
 ]
 
 MIDDLEWARE = [
