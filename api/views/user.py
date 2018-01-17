@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.http import JsonResponse
 from django.views import View
 
 from common.models import User
+from .response import ApiJsonResponse
 import requests
 
 class Login(View):
@@ -37,5 +37,5 @@ class Login(View):
         res = {
             'session': user_obj.session 
         }
-        return JsonResponse(res)
+        return ApiJsonResponse(res)
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.http import JsonResponse
 from django.views import View 
 from common import utils
+from .response import ApiJsonResponse
 from .weixin import WXPayment
 
 class Cart(View):
@@ -25,7 +25,7 @@ class Cart(View):
                 'total_amount': 0.01
             }
         }
-        return JsonResponse(res)
+        return ApiJsonResponse(res)
 
 
 class Settlement(View):
@@ -57,4 +57,4 @@ class Settlement(View):
                 'total_amount': 0.01
             }
         }
-        return JsonResponse(res)
+        return ApiJsonResponse(res)

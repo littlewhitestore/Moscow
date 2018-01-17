@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
-from django.http import JsonResponse, HttpResponse
-from django.views import View 
+from django.views import View
+from .response import ApiJsonResponse
 
 class HelloWorld(View):
     
     def get(self, request):
-        return HttpResponse("hello world!")
+        res = {
+            'text': 'hello world!'
+        }
+        return ApiJsonResponse(res)
 
 class Home(View):
     
@@ -24,5 +26,5 @@ class Home(View):
                 }
             ]
         }
-        return JsonResponse(res)
+        return ApiJsonResponse(res)
 
