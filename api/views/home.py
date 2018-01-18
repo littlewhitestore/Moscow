@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.views import View
+from .decorators import check_session 
 from .response import ApiJsonResponse
 
 class HelloWorld(View):
@@ -13,6 +14,7 @@ class HelloWorld(View):
 
 class Home(View):
     
+    @check_session
     def get(self, request):
         res = {
             'product_data_list': [
