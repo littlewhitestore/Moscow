@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from common.models import User
+from common.services.user import User
 
 def check_session(func):
     def wrapper(self, request, *args, **kwargs):
