@@ -9,3 +9,4 @@ from .goods import *
 from .home import *
 from .user import *
 from .settlement import *
+from .order import *
