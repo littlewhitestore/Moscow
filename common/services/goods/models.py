@@ -12,12 +12,12 @@ class Goods(models.Model):
     price = models.IntegerField(null=False, db_index=True)
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now_add=True)
-    
+
     def update_session(self, additional_info=''):
         info_str = str(self.id) + str(datetime.datetime.now()) + self.wx_openid
         if additional_info != None:
             info_str += additional_info
-        
+
         hash_md5_obj = hashlib.md5(info_str)
         self.session = hash_md5_obj.hexdigest()
         self.save()
