@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from common.services.settlement.buynow import BuyNowSettlementService
 from django.views import View
-from rest_framework import views, status
+from rest_framework import views
 
 from .decorators import check_session
 from .response import ApiJsonResponse
@@ -13,6 +13,7 @@ class Product(object):
     product_id = 100000
     goods_id = 100001
     name = '黑色毛衣'
+    market_price = 200
     price = 100
 
 class BuyNowSettlementView(views.APIView):
@@ -33,9 +34,9 @@ class BuyNowSettlementView(views.APIView):
     def post(self, request):
         product_id = request.data.get('product_id')
         number = request.data.get('number', 1)
-        print number
         receiver = request.data.get('receiver', None)
 
+        # 通过product_id获取product信息
         product = Product()
 
         service = BuyNowSettlementService(
