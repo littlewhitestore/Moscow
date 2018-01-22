@@ -13,7 +13,7 @@ class Order(models.Model):
     amount_payable = models.IntegerField(default=0)
     order_status = models.IntegerField(default=0)
     created_time = models.DateTimeField(auto_now_add=True)
-    updated_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'oms_order'
@@ -43,7 +43,7 @@ class OrderItem(models.Model):
     sale_price = models.IntegerField(default=0)
     number = models.IntegerField(default=0)
     created_time = models.DateTimeField(auto_now_add=True)
-    updated_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'oms_order_item'
@@ -59,7 +59,7 @@ class OrderReceiver(models.Model):
     mobile = models.CharField(max_length=16, blank=True)
     zipcode = models.CharField(max_length=10, blank=True)
     created_time = models.DateTimeField(auto_now_add=True)
-    updated_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'oms_order_receiver'

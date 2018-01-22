@@ -10,7 +10,7 @@ class UserModel(models.Model):
     wx_unionid = models.CharField(max_length=256, default='', db_index=True)
     wx_session_key = models.CharField(max_length=256, default='', db_index=True)
     created_time = models.DateTimeField(auto_now_add=True)
-    updated_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'common_user'

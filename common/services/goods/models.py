@@ -11,7 +11,7 @@ class Goods(models.Model):
     market_price = models.IntegerField(null=False, db_index=True)
     price = models.IntegerField(null=False, db_index=True)
     created_time = models.DateTimeField(auto_now_add=True)
-    updated_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
 
     def update_session(self, additional_info=''):
         info_str = str(self.id) + str(datetime.datetime.now()) + self.wx_openid
