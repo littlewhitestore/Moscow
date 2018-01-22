@@ -33,7 +33,7 @@ class BuyNowSettlementView(views.APIView):
     @check_session
     def post(self, request):
         product_id = request.data.get('product_id')
-        number = request.data.get('number', 1)
+        number = int(request.data.get('number', '1'))
         receiver = request.data.get('receiver', None)
 
         # 通过product_id获取product信息
