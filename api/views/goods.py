@@ -9,39 +9,25 @@ class GoodsDetail(View):
 
     def get(self, request, goods_id):
         res = {
-            'goods_info': {
-                'id': 1,
-                'brand': 'uptoyou',
-                'name': '内衣套装UP圣诞节礼物情趣内衣红色精致无钢圈可爱性感蕾丝内裤',
-                'banner_list': [
-                    utils.utils.generate_image_url('007125fd09tb2'),
-                    utils.generate_image_url('007268421btb2ud_xa___898341892'),
-                    utils.generate_image_url('00733905e5tb25abxa___898341892'),
-                    utils.generate_image_url('0074a7eb21tb20wgxa___898341892'),
-                    utils.generate_image_url('007631b580tb221vxa___898341892')
-                ],
-                'detail_image_list': [
-                    utils.generate_image_url('20171224144042-4-1_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-2_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-4_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-5_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-6_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-7_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-8_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-9_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-10_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-11_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-12_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-13_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-14_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-15_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-16_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-17_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-18_dmjbs0_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-19_dmjbs0'),
-                    utils.generate_image_url('20171224144042-4-20_dmjbs0'),
-                ]
-            }
+            "goods_id": 1234,
+            "goods_name": "台湾木匠手作恐龙考古侏罗纪化石巧克力礼盒新年礼物 现货顺丰",
+            "goods_price": 99.99,
+            "market_price": 129.99,
+            "banner_img_list":[
+                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/banner1.jpeg",
+                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/banner2.jpeg"
+            ], 
+            "postage_desc": "免邮费",
+            "services":[
+                {"type": 1, "desc":"正品保障"},
+                {"type": 2, "desc":"发货&售后"},
+                {"type": 3, "desc":"七天退换"}
+            ],
+            "goods_detail_img_list":[
+                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/test_goods_5.jpeg",
+                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/test_goods_6.jpeg",
+                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/test_goods_7.jpeg"
+            ]
         }
         return ApiJsonResponse(res)
 
