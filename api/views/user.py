@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.views import View
 
 from common.services.user import User
+from rest_framework import views
 from .response import ApiJsonResponse
 import requests
 
-class Login(View):
+class Login(views.APIView):
     
     def get(self, request):
         code = request.GET.get("code", None)

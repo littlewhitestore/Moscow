@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 from common.services.settlement.buynow import BuyNowSettlementService
-from django.views import View
 from rest_framework import views
 
 from .decorators import check_session

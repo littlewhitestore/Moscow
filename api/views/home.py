@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.views import View
+from rest_framework import views
 from .decorators import check_session 
 from .response import ApiJsonResponse
 
-class HelloWorld(View):
+class HelloWorld(views.APIView):
     
     def get(self, request):
         res = {
@@ -12,7 +12,7 @@ class HelloWorld(View):
         }
         return ApiJsonResponse(res)
 
-class Home(View):
+class Home(views.APIView):
     
     @check_session
     def get(self, request):

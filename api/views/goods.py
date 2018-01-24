@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.views import View
 from common import utils
+from rest_framework import views
 from .response import ApiJsonResponse
 
-class GoodsDetail(View):
+class GoodsDetail(views.APIView):
 
     def get(self, request, goods_id):
         res = {
