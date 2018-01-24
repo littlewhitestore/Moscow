@@ -13,30 +13,3 @@ class Goods(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
 
-    def update_session(self, additional_info=''):
-        info_str = str(self.id) + str(datetime.datetime.now()) + self.wx_openid
-        if additional_info != None:
-            info_str += additional_info
-
-        hash_md5_obj = hashlib.md5(info_str)
-        self.session = hash_md5_obj.hexdigest()
-        self.save()
-
-    @classmethod
-    def fetch_user_by_wx_openid(cls, openid):
-        try:
-            obj = cls.objects.get(wx_openid=openid)
-            return obj
-        except Exception:
-            pass
-        return None
-
-    @classmethod
-    def fetch_user_by_session(cls, session):
-        try:
-            obj = cls.objects.get(session=session)
-            return obj
-        except Exception:
-            pass
-        return None
-
