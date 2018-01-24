@@ -20,24 +20,26 @@ class Goods(object):
         return self.__id
     
     @classmethod
-    def create(cls, name, price, market_price, status=1, 
+    def create(cls, name, price, market_price, taobao_id='', status=1, 
         banner_image_list=None, detail_image_list=None):
         
         goods_model_obj = GoodsModel(
             name=name,
             price=price,
             market_price=market_price,
+            taobao_id=taobao_id,
             status=status
         )
         goods_model_obj.save()
-            
+        
+        obj = cls(goods_model_obj.id, goods_model_obj)
         if banner_image_list != None and len(banner_image_list) > 0:
-            goods_model_obj.update_banner_image_list(banner_image_list)
+            obj.update_banner_image_list(banner_image_list)
 
         if detail_image_list != None and len(detail_image_list) > 0:
-            goods_model_obj.update_detail_image_list(detail_image_list)
+            obj.update_detail_image_list(detail_image_list)
         
-        return cls(goods_model_obj.id, goods_model_obj)
+        return obj 
 
     def update(self, **update):
         self.__confirm_goods_obj()
@@ -61,10 +63,11 @@ class Goods(object):
 
 
     def update_banner_image_list(self, banner_image_list):
-        GoodsBannerImage.objects.filter(goods_id=self.id).delete()
+        GoodsBannerImageModel.objects.filter(goods_id=self.id).delete()
         sort = 1
         for image_url in banner_image_list:
-            image_obj = GoodsBannerImage(
+            image_obj = GoodsBannerImageModel(
+                goods_id=self.id,
                 url=image_url,
                 sort=sort
             )
@@ -73,10 +76,11 @@ class Goods(object):
     
 
     def update_detail_image_list(self, detail_image_list):
-        GoodsDetailImage.objects.filter(goods_id=self.id).delete()
+        GoodsDetailImageModel.objects.filter(goods_id=self.id).delete()
         sort = 1
         for image_url in detail_image_list:
-            image_obj = GoodsDetailImage(
+            image_obj = GoodsDetailImageModel(
+                goods_id=self.id,
                 url=image_url,
                 sort=sort
             )
