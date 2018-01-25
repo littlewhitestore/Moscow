@@ -9,26 +9,23 @@ from .response import ApiJsonResponse
 class GoodsDetail(views.APIView):
 
     def get(self, request, goods_id):
+        
+        goods_obj = Goods(1)
+        goods_info = goods_obj.read()
+        
         res = {
-            "goods_id": 1234,
-            "goods_name": "台湾木匠手作恐龙考古侏罗纪化石巧克力礼盒新年礼物 现货顺丰",
-            "goods_price": 99.99,
-            "market_price": 129.99,
-            "banner_img_list":[
-                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/banner1.jpeg",
-                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/banner2.jpeg"
-            ], 
+            "goods_id": goods_info['id'],
+            "goods_name": goods_info['name'], 
+            "goods_price": goods_info['price'], 
+            "market_price": goods_info['market_price'], 
+            "banner_img_list": goods_info['banner_image_list'],
+            "goods_detail_img_list": goods_info['detail_image_list'],
             "postage_desc": "免邮费",
             "services":[
                 {"type": 1, "desc":"正品保障"},
                 {"type": 2, "desc":"发货&售后"},
                 {"type": 3, "desc":"七天退换"}
             ],
-            "goods_detail_img_list":[
-                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/test_goods_5.jpeg",
-                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/test_goods_6.jpeg",
-                "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/test_goods_7.jpeg"
-            ]
         }
         return ApiJsonResponse(res)
 
@@ -46,7 +43,6 @@ class GoodsUpload(views.APIView):
         banner_image_list = banner_images.split(';')
         detail_image_list = detail_images.split(';')
         
-        print taobao_id
         goods_obj = Goods.create(
             name=name,
             taobao_id=taobao_id,
