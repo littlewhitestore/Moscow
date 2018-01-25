@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from common.services.settlement.buynow import BuyNowSettlementService
-from common.services.order.booking import OrderBookingService
+from common.services.order import Order
 
 from rest_framework import views
 
@@ -35,7 +35,6 @@ class BuyNowOrderView(views.APIView):
                 product, number, receiver)
         check_list = settlement_service.settlement()
 
-        order_service = OrderBookingService()
-        order_service.booking(user, check_list)
+        order = Order.create(user.id, check_list)
 
         return ApiJsonResponse()

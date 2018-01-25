@@ -37,6 +37,7 @@ class BuyNowSettlementService(object):
 
     def __calc_total_amount(self):
         self.check_list.check_product(self.product, self.number)
+        self.check_list.amount_payable = self.check_list.total_amount
 
     def __is_free_postage(self):
         return True
