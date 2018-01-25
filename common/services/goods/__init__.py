@@ -10,33 +10,33 @@ class Goods(object):
     def __init__(self, id, goods_model_obj=None):
         self.__id = int(id)
         self.__goods_model_obj = goods_model_obj
-        self.__goods_banner_image_list = None 
-        self.__goods_detail_image_list = None 
-    
+        self.__goods_banner_image_list = None
+        self.__goods_detail_image_list = None
+
     def __confirm_goods_obj(self):
         if self.__goods_model_obj == None:
             self.__goods_model_obj = GoodsModel.objects.get(pk=self.__id)
-     
+
     def __confirm_goods_banner_image_model(self):
         if self.__goods_banner_image_list == None:
             self.__goods_banner_image_list = []
             for obj in GoodsBannerImageModel.objects.filter(goods_id=self.id).order_by('sort'):
                 self.__goods_banner_image_list.append(obj.url)
-    
+
     def __confirm_goods_detail_image_model(self):
         if self.__goods_detail_image_list == None:
             self.__goods_detail_image_list = []
             for obj in GoodsBannerImageModel.objects.filter(goods_id=self.id).order_by('sort'):
                 self.__goods_detail_image_list.append(obj.url)
-            
+
     @property
     def id(self):
         return self.__id
-    
+
     @classmethod
-    def create(cls, name, price, market_price, taobao_id='', status=1, 
+    def create(cls, name, price, market_price, taobao_id='', status=1,
         banner_image_list=None, detail_image_list=None):
-        
+
         goods_model_obj = GoodsModel(
             name=name,
             price=price,
@@ -45,16 +45,16 @@ class Goods(object):
             status=status
         )
         goods_model_obj.save()
-        
+
         obj = cls(goods_model_obj.id, goods_model_obj)
         if banner_image_list != None and len(banner_image_list) > 0:
             obj.update_banner_image_list(banner_image_list)
 
         if detail_image_list != None and len(detail_image_list) > 0:
             obj.update_detail_image_list(detail_image_list)
-        
+
         return obj
-    
+
     def read(self):
         self.__confirm_goods_obj()
         self.__confirm_goods_banner_image_model()
@@ -72,7 +72,7 @@ class Goods(object):
 
     def update(self, **update):
         self.__confirm_goods_obj()
-        
+
         is_changed = False
         if 'name' in kwargs:
             self.__goods_model_obj.name = kwargs['name']
@@ -86,7 +86,7 @@ class Goods(object):
         if 'status' in kwargs:
             self.__goods_model_obj.status = int(kwargs['status'])
             is_changed = True
-        
+
         if is_changed == True:
             self.__goods_model_obj.save()
 
@@ -102,7 +102,7 @@ class Goods(object):
             )
             image_obj.save()
             sort += 1
-    
+
 
     def update_detail_image_list(self, detail_image_list):
         GoodsDetailImageModel.objects.filter(goods_id=self.id).delete()
@@ -115,5 +115,3 @@ class Goods(object):
             )
             image_obj.save()
             sort += 1
-        
-

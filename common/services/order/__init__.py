@@ -6,6 +6,13 @@ from .models import OrderReceiver as OrderReceiverModel
 
 from .snowflake import sn
 
+class OrderStatus(object):
+    PENDING_PAY = 0
+    PENDING_SHIP = 1
+    PENDING_RECEIVE = 2
+    CANCELLED = 3
+    FINISH = 4
+
 class Order(object):
     def __init__(self, order_id, model_obj=None):
         self.order_id = order_id
@@ -15,9 +22,9 @@ class Order(object):
 
     @classmethod
     def get_order_list(cls, user_id, offset, count):
-        qs = OrderModel.objects.filter(user_id)
+        qs = OrderModel.objects.filter(user_id=user_id).order_by('-created_time')
         qs = qs[offset: offset + count]
-        order_list = map(lambda _m:cls(_m.pk, model_obj=_m), qs)
+        order_list = map(lambda _m:cls(_m.pk, _m), qs)
         return order_list
 
     @classmethod
@@ -57,6 +64,31 @@ class Order(object):
             )
 
         return order
+
+    def set_pending_ship(self):
+        self.__confirm_order_model()
+        self.__model_obj.order_status = OrderStatus.PENDING_SHIP
+        self.__model_obj.save()
+
+    def set_pending_receiver(self):
+        self.__confirm_order_model()
+        self.__model_obj.order_status = OrderStatus.PENDING_RECEIVE
+        self.__model_obj.save()
+
+    def set_cancelled(self):
+        self.__confirm_order_model()
+        self.__model_obj.order_status = OrderStatus.CANCELLED
+        self.__model_obj.save()
+
+    def set_pending_receive(self):
+        self.__confirm_order_model()
+        self.__model_obj.order_status = OrderStatus.PENDING_RECEIVE
+        self.__model_obj.save()
+
+    def set_finish(self):
+        self.__confirm_order_model()
+        self.__model_obj.order_status = OrderStatus.FINISH
+        self.__model_obj.save()
 
     def __confirm_receiver(self):
         if self.__receiver is None:
@@ -132,9 +164,16 @@ class Order(object):
                 number)
 
 class OrderItem(object):
-    def __init__(self, order_item_id, order_item_model_obj=None):
+    def __init__(self, order_item_id, model_obj=None):
         self.order_item_id = order_item_id
-        self.__model_obj = order_item_model_obj
+        self.__model_obj = model_obj
+
+    def __confirm_model_obj(self):
+        if self.__model_obj is None:
+            try:
+                self.__model_obj = OrderItemModel.objects.get(pk=self.order_item_id)
+            except OrderItemModel.DoesNotExist:
+                pass
 
     @classmethod
     def get_order_item_list(cls, order_sn):
@@ -157,6 +196,17 @@ class OrderItem(object):
 
         return cls(order_item_model.pk, order_item_model)
 
+    def get_basic_info(self):
+        self.__confirm_model_obj()
+        return {
+            'goods_id': self.__model_obj.goods_id,
+            'product_id': self.__model_obj.product_id,
+            'number': self.__model_obj.number,
+            'product_name': self.__model_obj.product_name,
+            'market_price': self.__model_obj.market_price,
+            'sale_price': self.__model_obj.sale_price
+        }
+
 class OrderReceiver(object):
     def __init__(self, pk, order_receiver_model_obj=None):
         self.pk = pk
@@ -164,9 +214,20 @@ class OrderReceiver(object):
 
     @classmethod
     def get_order_receiver(cls, order_sn):
-        recevier_model = OrderReceiverModel.objects.get(
-                order_sn=order_sn)
-        return cls(recevier_model.pk, recevier_model)
+        try:
+            recevier_model = OrderReceiverModel.objects.get(
+                    order_sn=order_sn)
+            return cls(recevier_model.pk, recevier_model)
+        except OrderReceiverModel.DoesNotExist:
+            return None
+
+    def __confirm_model_obj(self):
+        if self.__model_obj is None:
+            try:
+                self.__model_obj = OrderReceiverModel.objects.get(
+                        pk=self.pk)
+            except OrderReceiverModel.DoesNotExist:
+                pass
 
     @classmethod
     def create(cls, order_sn, name, province, city, district, address, mobile, zipcode=''):
@@ -181,3 +242,14 @@ class OrderReceiver(object):
                 zipcode=zipcode)
 
         return cls(order_receiver_model.pk, order_receiver_model)
+
+    def get_basic_info(self):
+        self.__confirm_model_obj()
+        return {
+            'name': self.__model_obj.name,
+            'province': self.__model_obj.province,
+            'city': self.__model_obj.city,
+            'district': self.__model_obj.district,
+            'address': self.__model_obj.address,
+            'mobile': self.__model_obj.mobile
+        }
