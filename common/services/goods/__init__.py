@@ -10,10 +10,24 @@ class Goods(object):
     def __init__(self, id, goods_model_obj=None):
         self.__id = int(id)
         self.__goods_model_obj = goods_model_obj
+        self.__goods_banner_image_list = None 
+        self.__goods_detail_image_list = None 
     
     def __confirm_goods_obj(self):
         if self.__goods_model_obj == None:
             self.__goods_model_obj = GoodsModel.objects.get(pk=self.__id)
+     
+    def __confirm_goods_banner_image_model(self):
+        if self.__goods_banner_image_list == None:
+            self.__goods_banner_image_list = []
+            for obj in GoodsBannerImageModel.objects.filter(goods_id=self.id).order_by('sort'):
+                self.__goods_banner_image_list.append(obj.url)
+    
+    def __confirm_goods_detail_image_model(self):
+        if self.__goods_detail_image_list == None:
+            self.__goods_detail_image_list = []
+            for obj in GoodsBannerImageModel.objects.filter(goods_id=self.id).order_by('sort'):
+                self.__goods_detail_image_list.append(obj.url)
             
     @property
     def id(self):
@@ -39,7 +53,22 @@ class Goods(object):
         if detail_image_list != None and len(detail_image_list) > 0:
             obj.update_detail_image_list(detail_image_list)
         
-        return obj 
+        return obj
+    
+    def read(self):
+        self.__confirm_goods_obj()
+        self.__confirm_goods_banner_image_model()
+        self.__confirm_goods_detail_image_model()
+        goods_info = {
+            'id': self.__goods_model_obj.id,
+            'name': self.__goods_model_obj.name,
+            'price': self.__goods_model_obj.price,
+            'market_price': self.__goods_model_obj.market_price,
+            'status': self.__goods_model_obj.status,
+            'banner_image_list': self.__goods_banner_image_list,
+            'detail_image_list': self.__goods_detail_image_list,
+        }
+        return goods_info
 
     def update(self, **update):
         self.__confirm_goods_obj()
