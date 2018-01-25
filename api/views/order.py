@@ -44,6 +44,7 @@ class OrderListView(views.APIView):
         order_basic_info = order.get_order_basic_info()
         basic_data = {
             'order_id': order_basic_info.get('order_id'),
+            'status_desc': order.get_status_text(),
             'order_sn': order_basic_info.get('order_sn'),      # 订单号
             'postage': order_basic_info.get('postage'),        # 邮费
             'amount_payable': order_basic_info.get('amount_payable'), # 订单金额
@@ -76,6 +77,7 @@ class OrderDetailView(views.APIView):
         order_basic_info = order.get_order_basic_info()
         basic_data = {
             'order_id': order_basic_info.get('order_id'),
+            'status_desc': order.get_status_text(),
             'order_sn': order_basic_info.get('order_sn'),      # 订单号
             'postage': order_basic_info.get('postage'),        # 邮费
             'amount_payable': order_basic_info.get('amount_payable'), # 订单金额

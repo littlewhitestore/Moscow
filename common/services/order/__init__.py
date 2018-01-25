@@ -13,6 +13,16 @@ class OrderStatus(object):
     CANCELLED = 3
     FINISH = 4
 
+    @classmethod
+    def dict(cls):
+        return {
+            cls.PENDING_PAY: "待支付",
+            cls.PENDING_SHIP: "待发货",
+            cls.PENDING_RECEIVE: "待收货",
+            cls.FINISH: "已完成",
+            cls.CANCELLED: "已取消",
+        }
+
 class Order(object):
     def __init__(self, order_id, model_obj=None):
         self.order_id = order_id
@@ -26,6 +36,10 @@ class Order(object):
         qs = qs[offset: offset + count]
         order_list = map(lambda _m:cls(_m.pk, _m), qs)
         return order_list
+
+    def get_status_text(self):
+        self.__confirm_order_model()
+        return OrderStatus.dict().get(self.__model_obj.order_status, '')
 
     @classmethod
     def create(cls, user_id, check_list):
