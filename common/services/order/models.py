@@ -35,7 +35,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, to_field='order_sn', db_column='order_sn')
+    order_sn = models.CharField(max_length=32)
     goods_id = models.IntegerField()
     product_id = models.IntegerField()
     product_name = models.CharField(max_length=64, blank=True)
@@ -50,7 +50,8 @@ class OrderItem(models.Model):
 
 
 class OrderReceiver(models.Model):
-    order = models.OneToOneField(Order, to_field='order_sn', db_column='order_sn')
+    id = models.AutoField(primary_key=True)
+    order_sn = models.CharField(max_length=32)
     name = models.CharField(max_length=32, blank=True)
     province = models.CharField(max_length=32, blank=True)
     city = models.CharField(max_length=32, blank=True)
