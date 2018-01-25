@@ -50,6 +50,7 @@ class OrderItem(models.Model):
 
 
 class OrderReceiver(models.Model):
+    id = models.AutoField(primary_key=True)
     order = models.OneToOneField(Order, to_field='order_sn', db_column='order_sn')
     name = models.CharField(max_length=32, blank=True)
     province = models.CharField(max_length=32, blank=True)
