@@ -24,6 +24,11 @@ class User(object):
         self.__confirm_user_obj()
         return self.__user_model_obj.session
 
+    @property
+    def openid(self):
+        self.__confirm_user_obj()
+        return self.__user_model_obj.wx_openid
+
     @classmethod
     def fetch_user_by_wx_openid(cls, openid):
         try:

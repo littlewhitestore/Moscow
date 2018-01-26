@@ -64,3 +64,15 @@ class OrderReceiver(models.Model):
 
     class Meta:
         db_table = 'oms_order_receiver'
+
+class OrderTrade(models.Model):
+    id = models.AutoField(primary_key=True)
+    order_sn = models.CharField(max_length=32)
+    trade_no = models.CharField(max_length=32)
+    trade_amount = models.IntegerField(default=0)
+    trade_status = models.IntegerField(default=0)
+    created_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'oms_order_trade'

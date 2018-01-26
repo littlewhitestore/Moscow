@@ -1,8 +1,12 @@
 # *-* coding:utf-8 *-*
 
+import datetime
+import random
+
 from .models import Order as OrderModel
 from .models import OrderItem as OrderItemModel
 from .models import OrderReceiver as OrderReceiverModel
+from .models import OrderTrade as OrderTradeModel
 
 from .snowflake import sn
 
@@ -177,6 +181,12 @@ class Order(object):
                 sale_price,
                 number)
 
+    def apply_trade(self):
+        self.__confirm_order_model()
+        order_trade = OrderTrade.create(self.__model_obj.order_sn,
+                self.__model_obj.amount_payable)
+        return order_trade
+
 class OrderItem(object):
     def __init__(self, order_item_id, model_obj=None):
         self.order_item_id = order_item_id
@@ -266,4 +276,36 @@ class OrderReceiver(object):
             'district': self.__model_obj.district,
             'address': self.__model_obj.address,
             'mobile': self.__model_obj.mobile
+        }
+
+class OrderTrade(object):
+    def __init__(self, pk, model_obj=None):
+        self.pk = pk
+        self.__model_obj = model_obj
+
+    @classmethod
+    def create(cls, order_sn, trade_amount):
+        #TODO 当前逻辑可能生成重复交易号
+        prefix = datetime.datetime.now().strftime("%Y%m%d")
+        random_no = str(random.randint(1000000000, 9999999999))
+        trade_no = "%s%s" % (prefix, random_no)
+        order_trade_model = OrderTradeModel.objects.create(
+                trade_no=trade_no,
+                order_sn=order_sn,
+                trade_amount=trade_amount)
+        return cls(order_trade_model.pk, order_trade_model)
+
+    def __confirm_model_obj(self):
+        if self.__model_obj is None:
+            try:
+                self.__model_obj = OrderTradeModel.objects.get(
+                        pk=self.pk)
+            except OrderTradeModel.DoesNotExist:
+                pass
+
+    def get_basic_info(self):
+        self.__confirm_model_obj()
+        return {
+            'trade_no': self.__model_obj.trade_no,
+            'trade_amount': self.__model_obj.trade_amount,
         }

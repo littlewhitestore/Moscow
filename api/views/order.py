@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from common.services.settlement.buynow import BuyNowSettlementService
 from common.services.order import Order
+from common.services.mina.payment import MinaPayment
 
 from rest_framework import views
 
@@ -37,7 +38,23 @@ class BuyNowOrderView(views.APIView):
 
         order = Order.create(user.id, check_list)
 
-        return ApiJsonResponse()
+        order_trade = order.apply_trade()
+
+        # 配置是否需要根据APPID更换
+        trade_basic_info = order_trade.get_basic_info()
+        order_basic_info = order.get_order_basic_info()
+        mina_payment = MinaPayment('wxd4eae843e18ff7da',
+                '510861ca183551e3a7fcbdc87573c00f', '1495032292', 'aWNhdGUgQXV0aG9yXR5Q0wwYDVQQDEwR')
+        trade_no = trade_basic_info.get('trade_no')
+        trade_amount = trade_basic_info.get('trade_amount')
+        prepay_id = mina_payment.get_prepay_id(trade_no, 
+                trade_amount,
+                order_basic_info.get('order_sn'), 
+                request.user_obj.openid,
+                'https://www.xiaobaidiandev.com')
+        mina_payment_params = mina_payment.get_js_api_parameter(prepay_id)
+
+        return ApiJsonResponse(mina_payment_params)
 
 class OrderListView(views.APIView):
     def __order_data(self, order):
@@ -97,7 +114,6 @@ class OrderDetailView(views.APIView):
         receiver = order.get_receiver()
         if receiver:
             receiver_basic = receiver.get_basic_info()
-            print receiver_basic
             basic_data['receiver'] = {
                 'name': receiver_basic.get('name'),
                 'mobile': receiver_basic.get('mobile'),
