@@ -2,9 +2,13 @@
 
 from __future__ import unicode_literals
 
+import xmltodict
+
 from common.services.settlement.buynow import BuyNowSettlementService
 from common.services.order import Order
 from common.services.mina.payment import MinaPayment
+
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import views
 
@@ -48,13 +52,15 @@ class BuyNowOrderView(views.APIView):
                 trade_amount,
                 order_basic_info.get('order_sn'),
                 request.user_obj.openid,
-                'https://www.xiaobaidiandev.com')
+                'https://www.xiaobaidiandev.com/api/orders/{order_id}/payment'.format(
+                    order_id=order_basic_info.get('order_id'))
+            )
         mina_payment_params = mina_payment.get_js_api_parameter(prepay_id)
 
-        data = {
-            'order_id': order_basic_info.get('order_id'),
-            'mina_payment': mina_payment_params
-        }
+        #data = {
+        #    'order_id': order_basic_info.get('order_id'),
+        #    'mina_payment': mina_payment_params
+        #}
 
         return ApiJsonResponse(mina_payment_params)
 
@@ -134,3 +140,30 @@ class OrderDetailView(views.APIView):
         order = Order(order_id)
         data = self.__order_data(order)
         return ApiJsonResponse(data)
+
+class WeixinResponse(object):
+    def __init__(self, code='SUCCESS', msg='OK'):
+        self.__code = code
+        self.__msg = msg
+
+    def __str__(self):
+        return "<xml><return_code><![CDATA[%s]]></return_code><return_msg><![CDATA[%s]]></return_msg></xml>" % (self.__code, self.__msg)
+
+@csrf_exempt
+def weixin_pay_cb(request, order_id):
+    cb_data = xmltodict.parse(request.body).get('xml')
+    return_code = cb_data.get('return_code')
+    out_trade_no = cb_data.get('out_trade_no')
+    total_fee = cb_data.get('total_fee')
+    result_code = cb_data.get('result_code')
+    transaction_id = cb_data.get('transaction_id')
+    trade_type = cb_data.get('trade_type')
+    fee_type = cb_data.get('fee_type')
+    appid = cb_data.get("appid")
+    mch_id = cb_data.get("mch_id")
+
+    if return_code == "SUCCESS":
+        order = Order(order_id)
+        order.pay(out_trade_no)
+        return HttpResponse(WeixinResponse())
+    return HttpResponse(WeixinResponse(code="FAIL", msg="WEIXIN FAIL"))

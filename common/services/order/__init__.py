@@ -83,6 +83,15 @@ class Order(object):
 
         return order
 
+    def pay(self, trade_no):
+        order_trade = OrderTrade.from_trade_no(trade_no)
+        if order_trade:
+            order_trade.set_success()
+            order_trade_info = order_trade.get_basic_info()
+            trade_amount = order_trade_info.get('trade_amount')
+            if trade_amount == self.amount_payable:
+                self.set_pending_ship()
+
     def set_pending_ship(self):
         self.__confirm_order_model()
         self.__model_obj.order_status = OrderStatus.PENDING_SHIP
@@ -137,6 +146,12 @@ class Order(object):
             'created_time': self.__model_obj.created_time,
             'order_status': self.__model_obj.order_status
         }
+
+    @property
+    def amount_payable(self):
+        order_basic_info = self.get_order_basic_info()
+        amount_payable = order_basic_info.get('amount_payable')
+        return amount_payable
 
     def set_receiver(self, name, province, city, district, address, mobile, zipcode=''):
         '''
@@ -278,6 +293,9 @@ class OrderReceiver(object):
             'mobile': self.__model_obj.mobile
         }
 
+class TradeStatus(object):
+    SUCCESS = 1
+
 class OrderTrade(object):
     def __init__(self, pk, model_obj=None):
         self.pk = pk
@@ -295,6 +313,15 @@ class OrderTrade(object):
                 trade_amount=trade_amount)
         return cls(order_trade_model.pk, order_trade_model)
 
+    @classmethod
+    def from_trade_no(cls, trade_no):
+        try:
+            order_trade_model = OrderTradeModel.objects.get(
+                    trade_no=trade_no)
+            return cls(order_trade_model.pk, order_trade_model)
+        except OrderTradeModel.DoesNotExist:
+            return None
+
     def __confirm_model_obj(self):
         if self.__model_obj is None:
             try:
@@ -309,3 +336,9 @@ class OrderTrade(object):
             'trade_no': self.__model_obj.trade_no,
             'trade_amount': self.__model_obj.trade_amount,
         }
+
+    def set_success(self):
+        self.__confirm_model_obj()
+        if self.__model_obj:
+            self.__model_obj.trade_status = TradeStatus.SUCCESS
+            self.__model_obj.save()
