@@ -1,18 +1,14 @@
 # *-* coding:utf-8 *-*
 
 from __future__ import unicode_literals
-
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import views
 import xmltodict
 
-from common.services.settlement.buynow import BuyNowSettlementService
-from common.services.order import Order
 from common.services.mina.payment import MinaPayment
-
-from django.views.decorators.csrf import csrf_exempt
-
-from rest_framework import views
-
-from .decorators import check_session
+from common.services.order import Order
+from common.services.settlement.buynow import BuyNowSettlementService
+from .decorators import check_token
 from .response import ApiJsonResponse
 
 class Product(object):
@@ -24,7 +20,7 @@ class Product(object):
 
 class BuyNowOrderView(views.APIView):
 
-    @check_session
+    @check_token
     def post(self, request):
         product_id = request.data.get('product_id')
         number = request.data.get('number', 1)
@@ -88,7 +84,7 @@ class OrderListView(views.APIView):
         basic_data['items'] = items
         return basic_data
 
-    @check_session
+    @check_token
     def get(self, request):
         offset = request.data.get('offset', 0)
         count = request.data.get('count', 10)
@@ -135,7 +131,7 @@ class OrderDetailView(views.APIView):
             }
         return basic_data
 
-    @check_session
+    @check_token
     def get(self, request, order_id):
         order = Order(order_id)
         data = self.__order_data(order)

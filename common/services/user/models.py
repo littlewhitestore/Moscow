@@ -5,7 +5,7 @@ from django.db import models
 class UserModel(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=256, default='')
-    session = models.CharField(max_length=256, default='', db_index=True)
+    token = models.CharField(max_length=256, default='', db_index=True)
     wx_openid = models.CharField(max_length=256, db_index=True)
     wx_unionid = models.CharField(max_length=256, default='', db_index=True)
     wx_session_key = models.CharField(max_length=256, default='', db_index=True)
@@ -13,4 +13,4 @@ class UserModel(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'common_user'
+        db_table = 'user'

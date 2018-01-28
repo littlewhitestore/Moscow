@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from common.services.settlement.buynow import BuyNowSettlementService
 from rest_framework import views
 
-from .decorators import check_session
+from .decorators import check_token
 from .response import ApiJsonResponse
 
 class Product(object):
@@ -29,7 +29,7 @@ class BuyNowSettlementView(views.APIView):
             'number': item.number
         }
 
-    @check_session
+    @check_token
     def post(self, request):
         product_id = request.data.get('product_id')
         number = int(request.data.get('number', '1'))

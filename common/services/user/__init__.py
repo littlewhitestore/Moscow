@@ -20,9 +20,9 @@ class User(object):
         return self.__id
 
     @property
-    def session(self):
+    def token(self):
         self.__confirm_user_obj()
-        return self.__user_model_obj.session
+        return self.__user_model_obj.token
 
     @property
     def openid(self):
@@ -40,9 +40,9 @@ class User(object):
         return None
 
     @classmethod
-    def fetch_user_by_session(cls, session):
+    def fetch_user_by_token(cls, token):
         try:
-            user_model_obj = UserModel.objects.get(session=session)
+            user_model_obj = UserModel.objects.get(token=token)
             obj = cls(user_model_obj.id, user_model_obj)
             return obj
         except Exception:
@@ -59,7 +59,7 @@ class User(object):
         return cls(user_model_obj.id, user_model_obj)
 
 
-    def update_session(self, additional_info=''):
+    def update_token(self, additional_info=''):
         self.__confirm_user_obj()
 
         info_str = str(self.id) + str(datetime.datetime.now()) + self.__user_model_obj.wx_openid
@@ -67,6 +67,6 @@ class User(object):
             info_str += additional_info
         hash_md5_obj = hashlib.md5(info_str)
 
-        self.__user_model_obj.session = hash_md5_obj.hexdigest()
+        self.__user_model_obj.token = hash_md5_obj.hexdigest()
         self.__user_model_obj.save()
 

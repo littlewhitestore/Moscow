@@ -28,10 +28,10 @@ class Login(views.APIView):
             user_obj = User.fetch_user_by_wx_openid(wx_openid)
             if user_obj == None:
                 user_obj = User.create(wx_openid, wx_session_key)
-            user_obj.update_session(additional_info=code)
+            user_obj.update_token(additional_info=code)
 
         res = {
-            'session': user_obj.session 
+            'token': user_obj.token 
         }
         return ApiJsonResponse(res)
 

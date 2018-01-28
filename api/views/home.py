@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from rest_framework import views
-from .decorators import check_session 
+from .decorators import check_token 
 from .response import ApiJsonResponse
 
 class HelloWorld(views.APIView):
@@ -14,7 +14,7 @@ class HelloWorld(views.APIView):
 
 class Home(views.APIView):
     
-    @check_session
+    @check_token
     def get(self, request):
         res = {
             "banner_img_list": [

@@ -14,7 +14,7 @@ class GoodsModel(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
     
     class Meta:
-        db_table = 'common_goods'
+        db_table = 'goods'
 
 
 class GoodsBannerImageModel(models.Model):
@@ -26,7 +26,7 @@ class GoodsBannerImageModel(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
     
     class Meta:
-        db_table = 'common_goods_banner_image'
+        db_table = 'goods_banner_image'
 
 
 class GoodsDetailImageModel(models.Model):
@@ -38,4 +38,4 @@ class GoodsDetailImageModel(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'common_goods_detail_image'
+        db_table = 'goods_detail_image'

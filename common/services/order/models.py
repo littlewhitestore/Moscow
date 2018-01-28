@@ -16,7 +16,7 @@ class Order(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'oms_order'
+        db_table = 'order'
 
     def set_receiver(self, name,
             mobile,
@@ -46,7 +46,7 @@ class OrderItem(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'oms_order_item'
+        db_table = 'order_item'
 
 
 class OrderReceiver(models.Model):
@@ -63,7 +63,7 @@ class OrderReceiver(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'oms_order_receiver'
+        db_table = 'order_receiver'
 
 class OrderTrade(models.Model):
     id = models.AutoField(primary_key=True)
@@ -75,4 +75,4 @@ class OrderTrade(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'oms_order_trade'
+        db_table = 'order_trade'
