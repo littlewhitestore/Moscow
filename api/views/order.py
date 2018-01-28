@@ -18,9 +18,6 @@ class Product(object):
     market_price = 200
     price = 100
 
-class User(object):
-    id = 1
-
 class BuyNowOrderView(views.APIView):
 
     @check_session
@@ -30,13 +27,13 @@ class BuyNowOrderView(views.APIView):
         receiver = request.data.get('receiver', None)
 
         product = Product()
-        user = User()
+        user_obj = request.user_obj
 
         settlement_service = BuyNowSettlementService(
                 product, number, receiver)
         check_list = settlement_service.settlement()
 
-        order = Order.create(user.id, check_list)
+        order = Order.create(user_obj.id, check_list)
 
         order_trade = order.apply_trade()
 
@@ -89,8 +86,9 @@ class OrderListView(views.APIView):
     def get(self, request):
         offset = request.data.get('offset', 0)
         count = request.data.get('count', 10)
+        user_obj = request.user_obj
 
-        order_list = Order.get_order_list(1, offset, count)
+        order_list = Order.get_order_list(user_obj.id, offset, count)
         order_data = map(lambda _o: self.__order_data(_o), order_list)
         return ApiJsonResponse(order_data)
 

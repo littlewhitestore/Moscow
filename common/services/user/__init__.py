@@ -10,15 +10,15 @@ class User(object):
     def __init__(self, id, user_model_obj=None):
         self.__id = int(id)
         self.__user_model_obj = user_model_obj
-    
+
     def __confirm_user_obj(self):
         if self.__user_model_obj == None:
             self.__user_model_obj = UserModel.objects.get(pk=self.__id)
-            
+
     @property
     def id(self):
         return self.__id
-    
+
     @property
     def session(self):
         self.__confirm_user_obj()
@@ -61,12 +61,12 @@ class User(object):
 
     def update_session(self, additional_info=''):
         self.__confirm_user_obj()
-        
+
         info_str = str(self.id) + str(datetime.datetime.now()) + self.__user_model_obj.wx_openid
         if additional_info != None:
             info_str += additional_info
         hash_md5_obj = hashlib.md5(info_str)
-        
+
         self.__user_model_obj.session = hash_md5_obj.hexdigest()
         self.__user_model_obj.save()
 
