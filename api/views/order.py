@@ -47,12 +47,17 @@ class BuyNowOrderView(views.APIView):
                 '510861ca183551e3a7fcbdc87573c00f', '1495032292', 'aWNhdGUgQXV0aG9yXR5Q0wwYDVQQDEwR')
         trade_no = trade_basic_info.get('trade_no')
         trade_amount = trade_basic_info.get('trade_amount')
-        prepay_id = mina_payment.get_prepay_id(trade_no, 
+        prepay_id = mina_payment.get_prepay_id(trade_no,
                 trade_amount,
-                order_basic_info.get('order_sn'), 
+                order_basic_info.get('order_sn'),
                 request.user_obj.openid,
                 'https://www.xiaobaidiandev.com')
         mina_payment_params = mina_payment.get_js_api_parameter(prepay_id)
+
+        data = {
+            'order_id': order_basic_info.get('order_id'),
+            'mina_payment': mina_payment_params
+        }
 
         return ApiJsonResponse(mina_payment_params)
 
