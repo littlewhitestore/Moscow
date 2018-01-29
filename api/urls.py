@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^goods/upload$', views.GoodsUpload.as_view()),
     url(r'^helloworld$', views.HelloWorld.as_view()),
     url(r'^home$', views.Home.as_view()),
+    url(r'^home/banner/upload$', views.HomeBannerUpload.as_view()),
     url(r'^login$', views.Login.as_view()),
     url(r'^orders/(?P<order_id>\d+)/payment$', views.weixin_pay_cb)
 ]

@@ -8,9 +8,9 @@ from .models import HomeBannerImageModel
 class HomeBanner(object):
 
     @staticmethod
-    def add(url, refer, sort, status=1):
+    def add(image, refer, sort, status=1):
         obj = HomeBannerImageModel(
-            url=url,
+            image=image,
             refer=refer,
             sort=sort,
             status=status
@@ -24,7 +24,7 @@ class HomeBanner(object):
         for obj in HomeBannerImageModel.objects.filter(status=1).order_by('sort'):
             banner_list.append({
                 'id': obj.id,
-                'url': obj.url,
+                'image': obj.image,
                 'refer': obj.refer,
                 'sort': obj.sort,
             })

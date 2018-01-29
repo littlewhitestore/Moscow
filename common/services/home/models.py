@@ -6,7 +6,7 @@ from django.db import models
 
 class HomeBannerImageModel(models.Model):
     id = models.AutoField(primary_key=True)
-    url = models.CharField(max_length=1024, default='')
+    image = models.CharField(max_length=1024, default='')
     refer = models.CharField(max_length=1024, default='')
     sort = models.IntegerField(null=False, db_index=True)
     status = models.IntegerField(null=False, db_index=True)
