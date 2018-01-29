@@ -8,6 +8,7 @@ import xmltodict
 from common.services.mina.payment import MinaPayment
 from common.services.order import Order
 from common.services.settlement.buynow import BuyNowSettlementService
+from django.http import HttpResponse
 from .decorators import check_token
 from .response import ApiJsonResponse
 
@@ -16,7 +17,7 @@ class Product(object):
     goods_id = 100001
     name = '黑色毛衣'
     market_price = 200
-    price = 100
+    price = 1
 
 class BuyNowOrderView(views.APIView):
 
@@ -48,17 +49,16 @@ class BuyNowOrderView(views.APIView):
                 trade_amount,
                 order_basic_info.get('order_sn'),
                 request.user_obj.openid,
-                'https://www.xiaobaidiandev.com/api/orders/{order_id}/payment'.format(
-                    order_id=order_basic_info.get('order_id'))
+                'https://www.xiaobaidiandev.com/api/orders/{order_id}/payment'.format( order_id=order_basic_info.get('order_id'))
             )
         mina_payment_params = mina_payment.get_js_api_parameter(prepay_id)
 
-        #data = {
-        #    'order_id': order_basic_info.get('order_id'),
-        #    'mina_payment': mina_payment_params
-        #}
+        data = {
+            'order_id': order_basic_info.get('order_id'),
+            'mina_payment': mina_payment_params
+        }
 
-        return ApiJsonResponse(mina_payment_params)
+        return ApiJsonResponse(data)
 
 class OrderListView(views.APIView):
     def __order_data(self, order):

@@ -13,7 +13,7 @@ class Product(object):
     goods_id = 100001
     name = '黑色毛衣'
     market_price = 200
-    price = 100
+    price = 1
 
 class BuyNowSettlementView(views.APIView):
 
