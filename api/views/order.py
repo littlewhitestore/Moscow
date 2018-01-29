@@ -9,7 +9,7 @@ from common.services.mina.payment import MinaPayment
 from common.services.order import Order
 from common.services.settlement.buynow import BuyNowSettlementService
 from .decorators import check_token
-from .response import ApiJsonResponse
+from .response import ApiJsonResponse, ApiResponseStatusCode
 
 class Product(object):
     product_id = 100000
@@ -86,10 +86,12 @@ class OrderListView(views.APIView):
 
     @check_token
     def get(self, request):
+        user_obj = request.user_obj
+        if user_obj == None:
+            return ApiJsonResponse({}, ApiResponseStatusCode.RELOGIN) 
+        
         offset = request.data.get('offset', 0)
         count = request.data.get('count', 10)
-        user_obj = request.user_obj
-
         order_list = Order.get_order_list(user_obj.id, offset, count)
         order_data = map(lambda _o: self.__order_data(_o), order_list)
         return ApiJsonResponse(order_data)
@@ -133,8 +135,16 @@ class OrderDetailView(views.APIView):
 
     @check_token
     def get(self, request, order_id):
+        user_obj = request.user_obj
+        if user_obj == None:
+            return ApiJsonResponse({}, ApiResponseStatusCode.RELOGIN) 
+        
         order = Order(order_id)
         data = self.__order_data(order)
+        
+        if data['user_id'] != user_obj.id:
+            return ApiJsonResponse({}, ApiResponseStatusCode.ERROR, "WRONG USER") 
+            
         return ApiJsonResponse(data)
 
 class WeixinResponse(object):
