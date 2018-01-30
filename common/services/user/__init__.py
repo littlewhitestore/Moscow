@@ -4,6 +4,7 @@ import datetime
 import hashlib
 
 from .models import UserModel
+from .WXBizDataCrypt import WXBizDataCrypt
 
 class User(object):
 
@@ -69,4 +70,10 @@ class User(object):
 
         self.__user_model_obj.token = hash_md5_obj.hexdigest()
         self.__user_model_obj.save()
+
+    
+    def get_uuid(self, encryptedData, iv): 
+        pc = WXBizDataCrypt(appId, wx_session_key)
+        print pc.decrypt(encryptedData, iv)
+
 
