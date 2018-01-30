@@ -34,10 +34,10 @@ class Goods(object):
     def __confirm_goods_sku_model_list(self):
         if self.__goods_sku_model_list == None:
             self.__goods_sku_model_list = []
-            for obj in GoodsSkuModel.objects.filter(goods_id=self.id).order_by('sort'):
+            for obj in GoodsSkuModel.objects.filter(goods_id=self.id, status=1).order_by('created_time'):
                 self.__goods_sku_model_list.append(obj)
 
-    def __is_property_vector_conflict(pv_a, pv_b):
+    def __is_property_vector_conflict(self, pv_a, pv_b):
         if len(pv_a) != len(pv_b):
             return True
         i = 0
@@ -48,7 +48,7 @@ class Goods(object):
             if pv_a[i]['value'] != pv_b[i]['value']:
                 flag_same_value = False 
             i += 1
-        if flag_same_value == True
+        if flag_same_value == True:
             return True
         return False
 
@@ -58,7 +58,7 @@ class Goods(object):
         for obj in self.__goods_sku_model_list:
             if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
                 raise Exception("property_vector conflict!")
-            
+        
         obj = GoodsSkuModel(
             goods_id=self.id,
             image_url=image_url,

@@ -76,7 +76,7 @@ class GoodsSkuUpload(views.APIView):
                 'value': property_vector_list[i + 1], 
             })
             i += 2
-
+        
         goods_obj = Goods(goods_id)
         sku_id = goods_obj.add_sku(
             image_url=image_url,
@@ -87,7 +87,7 @@ class GoodsSkuUpload(views.APIView):
 
         
         res = {
-            'goods_id': goods_obj.id 
+            'goods_id': goods_obj.id, 
             'sku_id': sku_id 
         }
         return ApiJsonResponse(res)
