@@ -19,7 +19,6 @@ class Migration(migrations.Migration):
                 ('goods_id', models.IntegerField(db_index=True)),
                 ('image_url', models.CharField(default='', max_length=1024)),
                 ('property_vector', models.CharField(default='', max_length=512)),
-                ('market_price', models.IntegerField(db_index=True)),
                 ('price', models.IntegerField(db_index=True)),
                 ('stock', models.IntegerField(db_index=True)),
                 ('status', models.IntegerField(db_index=True)),

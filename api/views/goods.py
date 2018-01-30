@@ -12,6 +12,7 @@ class GoodsDetail(views.APIView):
         
         goods_obj = Goods(1)
         goods_info = goods_obj.read()
+        sku_list = goods_obj.fetch_sku_all()
         
         res = {
             "goods_id": goods_info['id'],
@@ -26,7 +27,35 @@ class GoodsDetail(views.APIView):
                 {"type": 2, "desc":"发货&售后"},
                 {"type": 3, "desc":"七天退换"}
             ],
+            "sku_list": [],
+            "property_vector": []
         }
+        
+        first = True
+        for sku in sku_list:
+            item = {
+                "sku_id": sku['id'],
+                "price": float(sku['price']) / 100.0, 
+                "property_value_vector": [], 
+                "img": sku['image_url'], 
+                "stock": sku['stock'], 
+            }
+            
+            i = 0
+            for kv in sku["property_vector"]:
+                if first == True:
+                    res["property_vector"].append({
+                        "key": kv["key"],
+                        "values": []
+                    })
+                item["property_value_vector"].append(kv['value'])
+                if not kv["value"] in res["property_vector"][i]["values"]:
+                    res["property_vector"][i]["values"].append(kv['value'])
+                i += 1
+            
+            res["sku_list"].append(item)
+            first = False
+        
         return ApiJsonResponse(res)
 
 
@@ -65,7 +94,6 @@ class GoodsSkuUpload(views.APIView):
         property_vector_str = request.data.get('property_vector_str')
         image_url = request.data.get('image_url')
         price = request.data.get('price')
-        market_price = request.data.get('market_price')
         stock = request.data.get('stock', 1000)
         
         property_vector_list = property_vector_str.split('|')
@@ -82,7 +110,6 @@ class GoodsSkuUpload(views.APIView):
         sku_id = goods_obj.add_sku(
             image_url=image_url,
             property_vector=property_vector, 
-            market_price=market_price, 
             price=price,
             stock=stock
         )

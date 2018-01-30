@@ -53,7 +53,7 @@ class Goods(object):
         return False
 
     
-    def add_sku(self, image_url, property_vector, market_price, price, stock=0, status=1):
+    def add_sku(self, image_url, property_vector, price, stock=0, status=1):
         self.__confirm_goods_sku_model_list()
         for obj in self.__goods_sku_model_list:
             if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
@@ -63,7 +63,6 @@ class Goods(object):
             goods_id=self.id,
             image_url=image_url,
             property_vector=json.dumps(property_vector),
-            market_price=market_price,
             price=price,
             stock=stock,
             status=status
@@ -113,6 +112,20 @@ class Goods(object):
             'detail_image_list': self.__goods_detail_image_list,
         }
         return goods_info
+
+    def fetch_sku_all(self):
+        self.__confirm_goods_sku_model_list()
+        sku_list = []
+        for sku in self.__goods_sku_model_list:
+            sku_list.append({
+                'id': sku.id,
+                'image_url': sku.image_url,
+                'property_vector': json.loads(sku.property_vector),
+                'price': sku.price,
+                'stock': sku.stock,
+            })
+        return sku_list
+
 
     def update(self, **update):
         self.__confirm_goods_obj()

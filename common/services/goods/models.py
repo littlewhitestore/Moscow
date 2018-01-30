@@ -21,7 +21,6 @@ class GoodsSkuModel(models.Model):
     goods_id = models.IntegerField(null=False, db_index=True)
     image_url = models.CharField(max_length=1024, default='')
     property_vector = models.CharField(max_length=512, default='')
-    market_price = models.IntegerField(null=False, db_index=True)
     price = models.IntegerField(null=False, db_index=True)
     stock = models.IntegerField(null=False, db_index=True)
     status = models.IntegerField(null=False, db_index=True)
