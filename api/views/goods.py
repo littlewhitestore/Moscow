@@ -58,3 +58,36 @@ class GoodsUpload(views.APIView):
             'goods_id': goods_obj.id 
         }
         return ApiJsonResponse(res)
+
+class GoodsSkuUpload(views.APIView):
+
+    def post(self, request, goods_id):
+        property_vector_str = request.data.get('property_vector_str')
+        image_url = request.data.get('image_url')
+        price = request.data.get('price')
+        market_price = request.data.get('market_price')
+        
+        property_vector_list = property_vector_str.split('|')
+        property_vector = []
+        i = 0
+        while (i < len(property_vector_list) or i < 4):
+            property_vector.append({
+                'key': property_vector_list[i], 
+                'value': property_vector_list[i + 1], 
+            })
+            i += 2
+
+        goods_obj = Goods(goods_id)
+        sku_id = goods_obj.add_sku(
+            image_url=image_url,
+            property_vector=property_vector, 
+            market_price=market_price, 
+            price=price
+        )
+
+        
+        res = {
+            'goods_id': goods_obj.id 
+            'sku_id': sku_id 
+        }
+        return ApiJsonResponse(res)

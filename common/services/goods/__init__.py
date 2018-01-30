@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import datetime
+import json
 import hashlib
 
-from .models import GoodsModel, GoodsBannerImageModel, GoodsDetailImageModel
+from .models import GoodsModel, GoodsBannerImageModel, GoodsDetailImageModel, GoodsSkuModel
 
 class Goods(object):
 
@@ -12,6 +13,7 @@ class Goods(object):
         self.__goods_model_obj = goods_model_obj
         self.__goods_banner_image_list = None
         self.__goods_detail_image_list = None
+        self.__goods_sku_model_list = None
 
     def __confirm_goods_obj(self):
         if self.__goods_model_obj == None:
@@ -28,6 +30,47 @@ class Goods(object):
             self.__goods_detail_image_list = []
             for obj in GoodsBannerImageModel.objects.filter(goods_id=self.id).order_by('sort'):
                 self.__goods_detail_image_list.append(obj.url)
+    
+    def __confirm_goods_sku_model_list(self):
+        if self.__goods_sku_model_list == None:
+            self.__goods_sku_model_list = []
+            for obj in GoodsSkuModel.objects.filter(goods_id=self.id).order_by('sort'):
+                self.__goods_sku_model_list.append(obj)
+
+    def __is_property_vector_conflict(pv_a, pv_b):
+        if len(pv_a) != len(pv_b):
+            return True
+        i = 0
+        flag_same_value = True 
+        while i < len(pv_a):
+            if pv_a[i]['key'] != pv_b[i]['key']:
+                return True
+            if pv_a[i]['value'] != pv_b[i]['value']:
+                flag_same_value = False 
+            i += 1
+        if flag_same_value == True
+            return True
+        return False
+
+    
+    def add_sku(self, image_url, property_vector, market_price, price, status=1):
+        self.__confirm_goods_sku_model_list()
+        for obj in self.__goods_sku_model_list:
+            if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
+                raise Exception("property_vector conflict!")
+            
+        obj = GoodsSkuModel(
+            goods_id=self.id,
+            image_url=image_url,
+            property_vector=json.dumps(property_vector),
+            market_price=market_price,
+            price=price,
+            status=status
+        )
+        obj.save()
+        self.__goods_sku_model_list.append(obj)
+        return obj.id
+
 
     @property
     def id(self):
