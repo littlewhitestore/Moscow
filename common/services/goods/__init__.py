@@ -53,7 +53,7 @@ class Goods(object):
         return False
 
     
-    def add_sku(self, image_url, property_vector, market_price, price, status=1):
+    def add_sku(self, image_url, property_vector, market_price, price, stock=0, status=1):
         self.__confirm_goods_sku_model_list()
         for obj in self.__goods_sku_model_list:
             if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
@@ -65,6 +65,7 @@ class Goods(object):
             property_vector=json.dumps(property_vector),
             market_price=market_price,
             price=price,
+            stock=stock,
             status=status
         )
         obj.save()

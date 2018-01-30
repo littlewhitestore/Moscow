@@ -66,6 +66,7 @@ class GoodsSkuUpload(views.APIView):
         image_url = request.data.get('image_url')
         price = request.data.get('price')
         market_price = request.data.get('market_price')
+        stock = request.data.get('stock', 1000)
         
         property_vector_list = property_vector_str.split('|')
         property_vector = []
@@ -82,7 +83,8 @@ class GoodsSkuUpload(views.APIView):
             image_url=image_url,
             property_vector=property_vector, 
             market_price=market_price, 
-            price=price
+            price=price,
+            stock=stock
         )
 
         
