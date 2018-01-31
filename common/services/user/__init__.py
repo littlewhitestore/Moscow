@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.conf import settings
 import datetime
 import hashlib
 
@@ -73,9 +74,10 @@ class User(object):
 
     
     def get_wx_encrypted_data(self, encryptedData, iv):
-        appId = 'wx4f4bc4dec97d474b'
-        wx_session_key = 'tiihtNczf5v6AKRyjwEUhQ=='
-        pc = WXBizDataCrypt(appId, wx_session_key)
-        print pc.decrypt(encryptedData, iv)
-
+        self.__confirm_user_obj()
+        pc = WXBizDataCrypt(settings.WECHAT_APP_ID, self.__user_model_obj.wx_session_key)
+        data = pc.decrypt(encryptedData, iv)
+        if data.has_key('unionId'):
+            self.__user_model_obj.wx_unionid = data['unionId']
+            self.__user_model_obj.save()
 
