@@ -5,6 +5,7 @@ from django.conf import settings
 
 from common.services.user import User
 from rest_framework import views
+from .decorators import check_token
 from .response import ApiJsonResponse
 import requests
 
@@ -33,5 +34,18 @@ class Login(views.APIView):
         res = {
             'token': user_obj.token 
         }
+        return ApiJsonResponse(res)
+
+class WXUserInfoUpload(views.APIView):
+    
+    @check_token
+    def post(self, request):
+        encrypted_data = request.data.get('encrypted_data')
+        iv = request.data.get('iv')
+        
+        user_obj = request.user_obj
+        user_obj.get_wx_encrypted_data(encrypted_data, iv)
+        
+        res = {}
         return ApiJsonResponse(res)
 

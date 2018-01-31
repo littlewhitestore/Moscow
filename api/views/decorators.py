@@ -6,10 +6,10 @@ from common.services.user import User
 def check_token(func):
     def wrapper(self, request, *args, **kwargs):
         token = None
-        if hasattr(request, 'GET'):
+        if request.method == 'GET': 
             token = request.GET.get('token', None)
-        elif hasattr(request, 'POST'):
-            token = request.GET.get('token', None)
+        elif request.method == 'POST': 
+            token = request.POST.get('token', None)
         else:
             raise Exception('object type %s has no GET nor POST attribute.'%type(request))
         request.user_obj = User.fetch_user_by_token(token)  

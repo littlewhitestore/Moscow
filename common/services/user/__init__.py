@@ -72,7 +72,9 @@ class User(object):
         self.__user_model_obj.save()
 
     
-    def get_uuid(self, encryptedData, iv): 
+    def get_wx_encrypted_data(self, encryptedData, iv):
+        appId = 'wx4f4bc4dec97d474b'
+        wx_session_key = 'tiihtNczf5v6AKRyjwEUhQ=='
         pc = WXBizDataCrypt(appId, wx_session_key)
         print pc.decrypt(encryptedData, iv)
 
