@@ -64,12 +64,12 @@ class Order(object):
                 amount_payable=amount_payable,
                 postage=postage)
         order =  cls(order_model.pk, model_obj=order_model)
-        for item in check_list.product_list:
-            order.add_order_item(item.product.goods_id,
-                    item.product.product_id,
-                    item.product.name,
-                    item.product.market_price,
-                    item.product.price,
+        for item in check_list.sku_list:
+            order.add_order_item(item.sku.goods_id,
+                    item.sku.sku_id,
+                    item.sku.name,
+                    item.sku.market_price,
+                    item.sku.price,
                     item.number)
         receiver = check_list.receiver
         order.set_receiver(receiver.get('name'),
@@ -182,7 +182,7 @@ class Order(object):
         self.__confirm_order_item_list()
         return self.__order_items
 
-    def add_order_item(self, goods_id, product_id, product_name,
+    def add_order_item(self, goods_id, sku_id, sku_name,
             market_price,
             sale_price,
             number):
@@ -190,8 +190,8 @@ class Order(object):
         order_item = OrderItem.create(
                 self.__model_obj.order_sn,
                 goods_id,
-                product_id,
-                product_name,
+                sku_id,
+                sku_name,
                 market_price,
                 sale_price,
                 number)
@@ -221,14 +221,14 @@ class OrderItem(object):
         return order_item_list
 
     @classmethod
-    def create(cls, order_sn, goods_id, product_id,
-            product_name, market_price, sale_price,
+    def create(cls, order_sn, goods_id, sku_id,
+            sku_name, market_price, sale_price,
             number):
         order_item_model = OrderItemModel.objects.create(
                 order_sn=order_sn,
                 goods_id=goods_id,
-                product_id=product_id,
-                product_name=product_name,
+                sku_id=sku_id,
+                sku_name=sku_name,
                 market_price=market_price,
                 sale_price=sale_price,
                 number=number)
@@ -239,9 +239,9 @@ class OrderItem(object):
         self.__confirm_model_obj()
         return {
             'goods_id': self.__model_obj.goods_id,
-            'product_id': self.__model_obj.product_id,
+            'sku_id': self.__model_obj.sku_id,
             'number': self.__model_obj.number,
-            'product_name': self.__model_obj.product_name,
+            'sku_name': self.__model_obj.sku_name,
             'market_price': self.__model_obj.market_price,
             'sale_price': self.__model_obj.sale_price
         }

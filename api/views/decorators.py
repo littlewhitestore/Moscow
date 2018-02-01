@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from common.services.user import User
+from .response import ApiJsonResponse, ApiResponseStatusCode
 
 def check_token(func):
     def wrapper(self, request, *args, **kwargs):
@@ -13,5 +14,12 @@ def check_token(func):
         else:
             raise Exception('object type %s has no GET nor POST attribute.'%type(request))
         request.user_obj = User.fetch_user_by_token(token)  
+        return func(self, request, *args, **kwargs)
+    return wrapper
+
+def login_required(func):
+    def wrapper(self, request, *args, **kwargs):
+        if request.user_obj == None:
+            return ApiJsonResponse({}, status_code=ApiResponseStatusCode.RELOGIN)  
         return func(self, request, *args, **kwargs)
     return wrapper

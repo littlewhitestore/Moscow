@@ -11,9 +11,9 @@ class Cart(views.APIView):
     def get(self, request):
         res = {
             'cart_info': {
-                'product_list': [
+                'sku_list': [
                     {
-                        'product_id': 1,
+                        'sku_id': 1,
                         'brand': 'uptoyou',
                         'name': '内衣套装UP圣诞节礼物情趣内衣红色精致无钢圈可爱性感蕾丝内裤',
                         'count': 2, 

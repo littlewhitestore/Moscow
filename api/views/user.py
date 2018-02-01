@@ -30,7 +30,7 @@ class Login(views.APIView):
             if user_obj == None:
                 user_obj = User.create(wx_openid, wx_session_key)
             user_obj.update_token(additional_info=code, wx_session_key=wx_session_key)
-
+            
         res = {
             'token': user_obj.token 
         }

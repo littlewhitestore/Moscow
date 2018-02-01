@@ -24,21 +24,23 @@ class Order(models.Model):
             city,
             district,
             address):
+        
         OrderReceiver.objects.create(
-                order=self,
-                name=name,
-                mobile=mobile,
-                province=province,
-                city=city,
-                district=district,
-                address=address)
+            order=self,
+            name=name,
+            mobile=mobile,
+            province=province,
+            city=city,
+            district=district,
+            address=address
+        )
 
 class OrderItem(models.Model):
     id = models.AutoField(primary_key=True)
     order_sn = models.CharField(max_length=32)
     goods_id = models.IntegerField()
-    product_id = models.IntegerField()
-    product_name = models.CharField(max_length=64, blank=True)
+    sku_id = models.IntegerField()
+    sku_name = models.CharField(max_length=64, blank=True)
     market_price = models.IntegerField(default=0)
     sale_price = models.IntegerField(default=0)
     number = models.IntegerField(default=0)

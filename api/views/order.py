@@ -1,6 +1,7 @@
 # *-* coding:utf-8 *-*
 
 from __future__ import unicode_literals
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import views
 import xmltodict
@@ -8,12 +9,11 @@ import xmltodict
 from common.services.mina.payment import MinaPayment
 from common.services.order import Order
 from common.services.settlement.buynow import BuyNowSettlementService
-from django.http import HttpResponse
-from .decorators import check_token
+from .decorators import check_token, login_required
 from .response import ApiJsonResponse, ApiResponseStatusCode
 
-class Product(object):
-    product_id = 100000
+class Sku(object):
+    sku_id = 100000
     goods_id = 100001
     name = '黑色毛衣'
     market_price = 200
@@ -22,16 +22,19 @@ class Product(object):
 class BuyNowOrderView(views.APIView):
 
     @check_token
+    @login_required
     def post(self, request):
-        product_id = request.data.get('product_id')
+        sku_id = request.data.get('sku_id')
         number = request.data.get('number', 1)
         receiver = request.data.get('receiver', None)
-
-        product = Product()
+            
+        print '................'
+        sku = Sku()
         user_obj = request.user_obj
+        print user_obj
 
         settlement_service = BuyNowSettlementService(
-                product, number, receiver)
+                sku, number, receiver)
         check_list = settlement_service.settlement()
 
         order = Order.create(user_obj.id, check_list)
@@ -76,7 +79,7 @@ class OrderListView(views.APIView):
             item_basic = order_item.get_basic_info()
             items.append({
                 'thumbnail': '#TODO获取sku的缩略图',
-                'product_name': item_basic.get('product_name'),
+                'sku_name': item_basic.get('sku_name'),
                 'number': item_basic.get('number'),
                 'attrs': ['颜色:卡其色', '尺寸: XL'],
                 'sale_price': item_basic.get('sale_price')
@@ -113,7 +116,7 @@ class OrderDetailView(views.APIView):
             item_basic = order_item.get_basic_info()
             items.append({
                 'thumbnail': '#TODO获取sku的缩略图',
-                'product_name': item_basic.get('product_name'),
+                'sku_name': item_basic.get('sku_name'),
                 'number': item_basic.get('number'),
                 'attrs': ['颜色:卡其色', '尺寸: XL'],
                 'sale_price': item_basic.get('sale_price')

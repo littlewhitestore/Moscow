@@ -8,8 +8,8 @@ from rest_framework import views
 from .decorators import check_token
 from .response import ApiJsonResponse
 
-class Product(object):
-    product_id = 100000
+class Sku(object):
+    sku_id = 100000
     goods_id = 100001
     name = '黑色毛衣'
     market_price = 200
@@ -19,30 +19,30 @@ class BuyNowSettlementView(views.APIView):
 
     def __item_data(self, item):
         return {
-            'name': item.product.name,
+            'name': item.sku.name,
             'attrs': [
                 '颜色:卡其色',
                 '尺码:XL'
             ],
-            'price': str(item.product.price), # item.price
+            'price': str(item.sku.price), # item.price
             'thumbnail': '', # 获取sku的缩略图
             'number': item.number
         }
 
     @check_token
     def post(self, request):
-        product_id = request.data.get('product_id')
+        sku_id = request.data.get('sku_id')
         number = int(request.data.get('number', '1'))
         receiver = request.data.get('receiver', None)
 
-        # 通过product_id获取product信息
-        product = Product()
+        # 通过sku_id获取sku信息
+        sku = Sku()
 
         service = BuyNowSettlementService(
-                product, number, receiver)
+                sku, number, receiver)
         check_list = service.settlement()
         data = {
-            'items': [self.__item_data(i) for i in check_list.product_list],
+            'items': [self.__item_data(i) for i in check_list.sku_list],
             'total_amount': str(check_list.total_amount),
             'postage': '包邮',
             'amount_payable': str(check_list.amount_payable)

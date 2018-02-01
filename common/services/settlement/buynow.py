@@ -1,8 +1,8 @@
 # *-* coding:utf-8 *-*
 
 class CheckItem(object):
-    def __init__(self, product, number):
-        self.product = product
+    def __init__(self, sku, number):
+        self.sku = sku
         self.number = number
 
 class CheckList(object):
@@ -11,20 +11,20 @@ class CheckList(object):
     '''
 
     def __init__(self):
-        self.product_list = []
+        self.sku_list = []
         self.total_amount = 0           #商品金额
         self.postage = 0                #运费
         self.is_free_postage = True     #是否包邮
         self.amount_payable = 0         #应付金额
         self.receiver = None
 
-    def check_product(self, product, number):
-        self.product_list.append(CheckItem(product, number))
-        self.total_amount += product.price * number
+    def check_sku(self, sku, number):
+        self.sku_list.append(CheckItem(sku, number))
+        self.total_amount += sku.price * number
 
 class BuyNowSettlementService(object):
-    def __init__(self, product, number, receiver=None):
-        self.product = product
+    def __init__(self, sku, number, receiver=None):
+        self.sku = sku
         self.number = number
         self.receiver = receiver
 
@@ -36,7 +36,7 @@ class BuyNowSettlementService(object):
         return self.check_list
 
     def __calc_total_amount(self):
-        self.check_list.check_product(self.product, self.number)
+        self.check_list.check_sku(self.sku, self.number)
         self.check_list.amount_payable = self.check_list.total_amount
 
     def __is_free_postage(self):

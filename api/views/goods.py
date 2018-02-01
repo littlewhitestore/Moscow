@@ -10,7 +10,7 @@ class GoodsDetail(views.APIView):
 
     def get(self, request, goods_id):
         
-        goods_obj = Goods(1)
+        goods_obj = Goods(goods_id)
         goods_info = goods_obj.read()
         sku_list = goods_obj.fetch_sku_all()
         
