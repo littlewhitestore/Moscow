@@ -45,12 +45,13 @@ class Home(views.APIView):
             })
             
         
-        home_banner_list = HomeBanner.fetch_all()
-        for banner in home_banner_list:
-            res['banner_img_list'].append({
-                'url': '',
-                'img': banner['image'] 
-            })
+        if offset == 0:
+            home_banner_list = HomeBanner.fetch_all()
+            for banner in home_banner_list:
+                res['banner_img_list'].append({
+                    'url': '',
+                    'img': banner['image'] 
+                })
         return ApiJsonResponse(res)
 
 
