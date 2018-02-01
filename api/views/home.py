@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+# -*- coding: utf-8 -*- from __future__ import unicode_literals
 from rest_framework import views
 
+from common.services.goods import Goods 
 from common.services.home import HomeBanner
 from .decorators import check_token
 from .response import ApiJsonResponse
@@ -18,27 +18,33 @@ class Home(views.APIView):
     
     @check_token
     def get(self, request):
+        
+        offset = int(request.GET.get('offset', '0'))
+        count = int(request.GET.get('count', '20'))
+        
         res = {
             "banner_img_list": [],
-            "goods_list": [
-                {
-                    "goods_id": 1000,
-                    "goods_name": "爆款毛衣",
-                    "goods_price": 99.99,
-                    "market_price": 129.99,
-                    "goods_img": "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/test_goods_1.jpeg",
-                    "url": "../goods/detail?goodsId=1000",
-                },
-                {
-                    "goods_id": 1000,
-                    "goods_name": "爆款毛衣",
-                    "goods_price": 99.99,
-                    "market_price": 129.99,
-                    "goods_img": "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/test_goods_1.jpeg",
-                    "url": "../goods/detail?goodsId=1000",
-                }
-            ]
+            "goods_list": []
         }
+        
+        goods_obj_list = Goods.fetch_recommend_goods(offset, count)
+        for goods_obj in goods_obj_list:
+            goods_info = goods_obj.read()
+            
+            goods_img = '' 
+            if len(goods_info['banner_image_list']) > 0:
+                goods_img = goods_info['banner_image_list'][0]
+            
+            res['goods_list'].append({
+                "goods_id": 1000,
+                "goods_name": goods_info['name'], 
+                "goods_price": float(goods_info['price']) / 100.0, 
+                "market_price": float(goods_info['market_price']) / 100.0, 
+                "goods_img": goods_img,
+                "url": "../goods/detail?goodsId=%d"%goods_obj.id,
+            })
+            
+        
         home_banner_list = HomeBanner.fetch_all()
         for banner in home_banner_list:
             res['banner_img_list'].append({

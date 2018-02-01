@@ -97,6 +97,17 @@ class Goods(object):
             obj.update_detail_image_list(detail_image_list)
 
         return obj
+    
+    
+    @classmethod
+    def fetch_recommend_goods(cls, offset=0, count=20):
+        goods_obj_list = []
+        for goods_model_obj in GoodsModel.objects.filter(status=1).order_by('-created_time')[offset : offset + count]:
+            goods_obj_list.append(cls(goods_model_obj.id, goods_model_obj))
+        return goods_obj_list
+            
+
+
 
     def read(self):
         self.__confirm_goods_obj()
