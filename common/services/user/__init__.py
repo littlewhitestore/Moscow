@@ -61,7 +61,7 @@ class User(object):
         return cls(user_model_obj.id, user_model_obj)
 
 
-    def update_token(self, additional_info=''):
+    def update_token(self, additional_info, wx_session_key):
         self.__confirm_user_obj()
 
         info_str = str(self.id) + str(datetime.datetime.now()) + self.__user_model_obj.wx_openid
@@ -70,14 +70,17 @@ class User(object):
         hash_md5_obj = hashlib.md5(info_str)
 
         self.__user_model_obj.token = hash_md5_obj.hexdigest()
+        self.__user_model_obj.wx_session_key = wx_session_key 
         self.__user_model_obj.save()
 
     
     def get_wx_encrypted_data(self, encryptedData, iv):
         self.__confirm_user_obj()
+
         pc = WXBizDataCrypt(settings.WECHAT_APP_ID, self.__user_model_obj.wx_session_key)
         data = pc.decrypt(encryptedData, iv)
+        
         if data.has_key('unionId'):
             self.__user_model_obj.wx_unionid = data['unionId']
             self.__user_model_obj.save()
-
+        

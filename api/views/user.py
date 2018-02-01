@@ -25,11 +25,11 @@ class Login(views.APIView):
             ret_data = ret.json()
             wx_openid = ret_data['openid']
             wx_session_key = ret_data['session_key']
-
+            
             user_obj = User.fetch_user_by_wx_openid(wx_openid)
             if user_obj == None:
                 user_obj = User.create(wx_openid, wx_session_key)
-            user_obj.update_token(additional_info=code)
+            user_obj.update_token(additional_info=code, wx_session_key=wx_session_key)
 
         res = {
             'token': user_obj.token 
@@ -40,6 +40,7 @@ class WXUserInfoUpload(views.APIView):
     
     @check_token
     def post(self, request):
+        
         encrypted_data = request.data.get('encrypted_data')
         iv = request.data.get('iv')
         

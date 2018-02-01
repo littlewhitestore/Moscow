@@ -8,8 +8,8 @@ def check_token(func):
         token = None
         if request.method == 'GET': 
             token = request.GET.get('token', None)
-        elif request.method == 'POST': 
-            token = request.POST.get('token', None)
+        elif request.method == 'POST':
+            token = request.data.get('token', None)
         else:
             raise Exception('object type %s has no GET nor POST attribute.'%type(request))
         request.user_obj = User.fetch_user_by_token(token)  
