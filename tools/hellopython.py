@@ -124,10 +124,10 @@ def readCsvToData():
     with open(file_csv_path, "r") as csvFile:
         reader = csv.DictReader(csvFile.read().splitlines(), delimiter='\t' )  # 返回的是迭代类型
         col_title = [row for row in reader]
-        print type(col_title)
-        print len(col_title)
-        print col_title[1]
-        print col_title[2]
+#        print type(col_title)
+#        print len(col_title)
+#        print col_title[1]
+#        print col_title[2]
 #        print "测试循环row === %s" %  col_title
 #        col_price = [row['price'] for row in reader]
 #        col_desc = [row['description'] for row in reader]
@@ -135,7 +135,9 @@ def readCsvToData():
 #        col_numid = [row['num_id'] for row in reader]
 #        col_subt = [row['subtitle'] for row in reader]
         for item in col_title:
-# print "item = %s " %item
+            print type(item)
+            print len(item)
+            print item.keys() 
             file_obj = fileObj()
             file_obj.goods_name = item['title']
             file_obj.goods_price = item['price']
