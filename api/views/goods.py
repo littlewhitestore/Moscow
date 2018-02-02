@@ -99,7 +99,7 @@ class GoodsSkuUpload(views.APIView):
         property_vector_list = property_vector_str.split('|')
         property_vector = []
         i = 0
-        while (i < len(property_vector_list) or i < 4):
+        while (i < len(property_vector_list) and i < 4):
             property_vector.append({
                 'key': property_vector_list[i], 
                 'value': property_vector_list[i + 1], 
