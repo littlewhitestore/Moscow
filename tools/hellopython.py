@@ -80,7 +80,7 @@ def is_img(ext):
         return False
 
 def getFile():
-    file_path = "/Users/e/xiaobaike/xiaobaike_data"
+    file_path = "."
     root_files = os.walk(file_path)
     global file_csv_path
     global goods_banner_dir
@@ -124,6 +124,7 @@ def readCsvToData():
     with open(file_csv_path, "r") as csvFile:
         reader = csv.DictReader(csvFile.read().splitlines(), delimiter='\t' )  # 返回的是迭代类型
         col_title = [row for row in reader]
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~"
 #        print type(col_title)
 #        print len(col_title)
 #        print col_title[1]
@@ -149,7 +150,7 @@ def readCsvToData():
                 banner_img = goods_banner_dir + pic_str_c.split(':')[0]                          
                 file_obj.banner_url.append(banner_img)
             prn_obj(file_obj)
-            print "img_string = %s" % img_string
+#            print "img_string = %s" % img_string
             banner_url = []
             desc_img_url = []
             desc_string = []
