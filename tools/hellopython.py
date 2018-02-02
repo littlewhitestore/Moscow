@@ -22,7 +22,7 @@ class fileObj(object):
         self.banner_url = []
         self.desc_img_url = []
         self.desc_string = []
-        self.stock = 0
+        self.stock = 1000
 global file_csv_path 
 global file_csv_modify_path
 file_csv_modify_path = "/Users/e/xiaobaike/xiaobaike_data/商品信息 0201.xlsx"
@@ -111,17 +111,23 @@ def getFile():
             #第二级目录 包含 一个商品名称的目录
             goods_desc_dir = roots
             print goods_desc_dir
-# elif (dir_lv - first_dir ==3) :
+            print dirs
+#        elif (dir_lv - first_dir ==3) :
             #第三级目录 包含 商品详情的图文文件 
-            
-        print "减掉后的层次==%s" %(dir_lv - first_dir)
+# print dirs    
+#        print "减掉后的层次==%s" %(dir_lv - first_dir)
 def readCsvToData():
 # 读取csv文件方式1
     global file_csv_path
+    global goods_banner_dir
     print "读取csv 路径= " + file_csv_path
-    with codecs.open(file_csv_path, "r") as csvFile:
-        reader = csv.DictReader(csvFile)  # 返回的是迭代类型
+    with open(file_csv_path, "r") as csvFile:
+        reader = csv.DictReader(csvFile.read().splitlines(), delimiter='\t' )  # 返回的是迭代类型
         col_title = [row for row in reader]
+        print type(col_title)
+        print len(col_title)
+        print col_title[1]
+        print col_title[2]
 #        print "测试循环row === %s" %  col_title
 #        col_price = [row['price'] for row in reader]
 #        col_desc = [row['description'] for row in reader]
@@ -129,7 +135,22 @@ def readCsvToData():
 #        col_numid = [row['num_id'] for row in reader]
 #        col_subt = [row['subtitle'] for row in reader]
         for item in col_title:
-            print "item = %s " %item
+# print "item = %s " %item
+            file_obj = fileObj()
+            file_obj.goods_name = item['title']
+            file_obj.goods_price = item['price']
+            file_obj.tb_id =item['num_id']
+
+            desc_string = item['description']
+            img_string = item['picture']
+            for pic_str_c in img_string.split('|;'):
+                banner_img = goods_banner_dir + pic_str_c.split(':')[0]                          
+                file_obj.banner_url.append(banner_img)
+            prn_obj(file_obj)
+            print "img_string = %s" % img_string
+            banner_url = []
+            desc_img_url = []
+            desc_string = []
 #    print "price= %s" % col_price
 #    print "desc= %s" % col_desc
 #    print "pic= %s" % col_pic
@@ -141,7 +162,8 @@ def readCsvToData():
 #解析csv文件内容
 def parseCsv():
     print "1" 
-
+def prn_obj(obj): 
+    print '\n'.join(['%s:%s' % item for item in obj.__dict__.items()]) 
 if __name__ == '__main__':
     getFile()
     print readCsvToData()
