@@ -17,8 +17,8 @@ class GoodsDetail(views.APIView):
         res = {
             "goods_id": goods_info['id'],
             "goods_name": goods_info['name'], 
-            "goods_price": goods_info['price'], 
-            "market_price": goods_info['market_price'], 
+            "goods_price": float(goods_info['price']) / 100.0, 
+            "market_price": float(goods_info['market_price']) / 100.0, 
             "banner_img_list": goods_info['banner_image_list'],
             "goods_detail_img_list": goods_info['detail_image_list'],
             "postage_desc": "免邮费",
@@ -77,7 +77,7 @@ class GoodsUpload(views.APIView):
             taobao_id=taobao_id,
             price=price,
             market_price=market_price,
-            status=0,
+            status=1,
             banner_image_list=banner_image_list,
             detail_image_list=detail_image_list
         )

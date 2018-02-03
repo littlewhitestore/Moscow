@@ -2,14 +2,14 @@
 import json 
 import requests
 
-taobao_id = '45344084524'
-name = '山楂零食山楂球'
+taobao_id = '560505320361'
+name = '琥珀核桃仁 酥脆芝麻核桃仁罐装'
 property_key = '规格'
-property_value = '净重230g/罐 彩色标签'
-price = 1250 
-market_price = 2200 
-banner_img_number = 3
-detail_img_number = 9 
+property_value = '红糖口味150g'
+price = 1700
+market_price = 2800 
+banner_img_number = 4
+detail_img_number = 8 
 image_url_prefix = "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/"
 
 banner_img_list = []
