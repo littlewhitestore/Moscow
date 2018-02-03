@@ -36,7 +36,7 @@ class Home(views.APIView):
                 goods_img = goods_info['banner_image_list'][0]
             
             res['goods_list'].append({
-                "goods_id": 1000,
+                "goods_id": goods_info['id'],
                 "goods_name": goods_info['name'], 
                 "goods_price": float(goods_info['price']) / 100.0, 
                 "market_price": float(goods_info['market_price']) / 100.0, 

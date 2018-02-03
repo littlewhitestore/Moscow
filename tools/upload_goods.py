@@ -2,14 +2,14 @@
 import json 
 import requests
 
-taobao_id = '45248183806'
-name = '蜜饯果脯 芒果片 罐装零食'
+taobao_id = '45344084524'
+name = '山楂零食山楂球'
 property_key = '规格'
-property_value = '净重130g/罐 彩色标签'
-price = 1800
-market_price = 2500
+property_value = '净重230g/罐 彩色标签'
+price = 1250 
+market_price = 2200 
 banner_img_number = 3
-detail_img_number = 11
+detail_img_number = 9 
 image_url_prefix = "http://xiaobaidian-img-001-1255633922.picgz.myqcloud.com/"
 
 banner_img_list = []
