@@ -210,7 +210,7 @@ def delivery(request, order_sn):
         logistics_data = last_result.get('data')
         order = Order.get_order_by_sn(order_sn)
         if order:
-            order.refresh_logistics(com, nu, logistics_data, is_check=ischeck)
+            order.refresh_logistics(com, nu, json.dumps(logistics_data), is_check=ischeck)
 
     data = {
         "result": "true",
