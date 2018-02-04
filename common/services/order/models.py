@@ -90,3 +90,14 @@ class OrderLogistics(models.Model):
 
     class Meta:
         db_table = 'order_logistics'
+
+ExpressCompany = {
+    'shunfeng': "顺丰快递",
+    'quanritongkuaidi': "全日通",
+    'yuantong': "圆通快递",
+    'zhongtong': "中通快递",
+    'shentong': "申通快递",
+    'tiantian': "天天快递",
+    'quanfengkuaidi': "全峰快递",
+    'yunda': "韵达快递",
+}

@@ -10,6 +10,7 @@ from .models import OrderItem as OrderItemModel
 from .models import OrderReceiver as OrderReceiverModel
 from .models import OrderTrade as OrderTradeModel
 from .models import OrderLogistics as OrderLogisticsModel
+from .models import ExpressCompany
 
 from .snowflake import sn
 
@@ -430,6 +431,7 @@ class OrderLogistics(object):
         self.__confirm_model_obj()
         return {
             'com': self.__model_obj.com,
+            'com_name': ExpressCompany.get(self.__model_obj.com, '未知'),
             'nu': self.__model_obj.nu,
             'data': self.__model_obj.data
         }

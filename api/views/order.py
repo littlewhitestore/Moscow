@@ -146,7 +146,7 @@ class OrderDetailView(views.APIView):
         if logistics:
             logistics_basic = logistics.get_basic_info()
             logistics_res = {
-                'com': logistics_basic.get('com'),
+                'com': logistics_basic.get('com_name'),
                 'nu': logistics_basic.get('nu'),
             }
             logistics_data = logistics_basic.get('data')
