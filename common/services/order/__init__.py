@@ -403,7 +403,7 @@ class OrderLogistics(object):
         self.pk = pk
         self.__model_obj = model_obj
 
-    def confirm_model_obj(self):
+    def __confirm_model_obj(self):
         if self.__model_obj is None:
             try:
                 self.__model_obj = OrderLogisticsModel.objects.get(pk=self.pk)
@@ -442,8 +442,8 @@ class OrderLogistics(object):
     def subscribe(self):
         self.__confirm_model_obj()
         __body = {
-            "company": com,
-            "number": nu,
+            "company": self.__model_obj.com,
+            "number": self.__model_obj.nu,
             "key": "VBTKOCdI7267",
             "parameters": {
                 "callbackurl": 'https://www.xiaobaidiandev.com/orders/%s/logistics' % self.__model_obj.order_sn

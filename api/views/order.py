@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 from django.conf import settings
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import views
 import xmltodict
