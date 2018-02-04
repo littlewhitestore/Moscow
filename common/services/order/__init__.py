@@ -1,12 +1,15 @@
 # *-* coding:utf-8 *-*
 
 import datetime
+import json
 import random
+import requests
 
 from .models import Order as OrderModel
 from .models import OrderItem as OrderItemModel
 from .models import OrderReceiver as OrderReceiverModel
 from .models import OrderTrade as OrderTradeModel
+from .models import OrderLogistics as OrderLogisticsModel
 
 from .snowflake import sn
 
@@ -32,6 +35,7 @@ class Order(object):
         self.order_id = order_id
         self.__model_obj = model_obj
         self.__receiver = None
+        self.__logistics = None
         self.__order_items = []
 
     @classmethod
@@ -44,6 +48,14 @@ class Order(object):
     def get_status_text(self):
         self.__confirm_order_model()
         return OrderStatus.dict().get(self.__model_obj.order_status, '')
+
+    @classmethod
+    def get_order_by_sn(cls, order_sn):
+        try:
+            model_obj = OrderModel.objects.get(order_sn=order_sn)
+            return cls(model_obj.pk, model_obj=model_obj)
+        except OrderModel.DoesNotExist:
+            return None
 
     @classmethod
     def create(cls, user_id, check_list):
@@ -129,6 +141,11 @@ class Order(object):
             except OrderModel.DoesNotExist:
                 pass
 
+    def __confirm_logistics(self):
+        if self.__logistics is None:
+            self.__confirm_order_model()
+            self.__logistics = OrderLogistics.get_order_logistics(self.__model_obj.order_sn)
+
     def __confirm_order_item_list(self):
         if not self.__order_items:
             self.__confirm_order_model()
@@ -201,6 +218,43 @@ class Order(object):
         order_trade = OrderTrade.create(self.__model_obj.order_sn,
                 self.__model_obj.amount_payable)
         return order_trade
+
+    def get_logistics(self):
+        self.__confirm_logistics()
+        return self.__logistics
+
+
+    def delivery(self, com, nu):
+        '''
+        订单发货
+
+        参数:
+        @param com: 物流公司对应的快递100的code
+        @param nu:  物流单号
+        '''
+        self.__confirm_logistics()
+        if self.__logistics is None:
+            self.__logistics = OrderLogistics.create(self.__model_obj.order_sn,
+                    com, nu)
+            self.set_pending_receive()
+
+    def delivery_and_subscribe(self, com, nu):
+        self.delivery(com, nu)
+        self.__confirm_logistics()
+        self.__logistics.subscribe()
+
+    def refresh_logistics(self, com, nu, logistics_data, is_check=False):
+        '''
+        更新订单的物流信息
+        '''
+        self.__confirm_logistics()
+        logistics_basic_info = self.__logistics.get_basic_info()
+        _com = logistics_basic_info.get('com')
+        _nu = logistics_basic_info.get('nu')
+        if com == _com and nu == _nu:
+            self.__logistics.refresh(logistics_data)
+            if is_check:
+                self.set_finish()
 
 class OrderItem(object):
     def __init__(self, order_item_id, model_obj=None):
@@ -343,3 +397,60 @@ class OrderTrade(object):
         if self.__model_obj:
             self.__model_obj.trade_status = TradeStatus.SUCCESS
             self.__model_obj.save()
+
+class OrderLogistics(object):
+    def __init__(self, pk, model_obj=None):
+        self.pk = pk
+        self.__model_obj = model_obj
+
+    def confirm_model_obj(self):
+        if self.__model_obj is None:
+            try:
+                self.__model_obj = OrderLogisticsModel.objects.get(pk=self.pk)
+            except OrderLogisticsModel.DoesNotExist:
+                pass
+
+    @classmethod
+    def create(cls, order_sn, com, nu):
+        model_obj = OrderLogisticsModel.objects.create(
+                order_sn=order_sn,
+                com=com,
+                nu=nu)
+        return cls(model_obj.pk, model_obj=model_obj)
+
+    @classmethod
+    def get_order_logistics(cls, order_sn):
+        try:
+            model_obj = OrderLogisticsModel.objects.get(order_sn=order_sn)
+            return cls(model_obj.pk, model_obj=model_obj)
+        except OrderLogisticsModel.DoesNotExist:
+            return None
+
+    def get_basic_info(self):
+        self.__confirm_model_obj()
+        return {
+            'com': self.__model_obj.com,
+            'nu': self.__model_obj.nu,
+            'data': self.__model_obj.data
+        }
+
+    def refresh(self, data):
+        self.__confirm_model_obj()
+        self.__model_obj.data = data
+        self.__model_obj.save()
+
+    def subscribe(self):
+        self.__confirm_model_obj()
+        __body = {
+            "company": com,
+            "number": nu,
+            "key": "VBTKOCdI7267",
+            "parameters": {
+                "callbackurl": 'https://www.xiaobaidiandev.com/orders/%s/logistics' % self.__model_obj.order_sn
+            }
+        }
+        data = {
+            "schema": "json",
+            "param": json.dumps(__body)
+        }
+        r = requests.post("http://www.kuaidi100.com/poll", data=data)
