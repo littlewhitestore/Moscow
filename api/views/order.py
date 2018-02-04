@@ -142,6 +142,18 @@ class OrderDetailView(views.APIView):
                     receiver_basic.get('address'),
                 ])
             }
+        logistics = order.get_logistics()
+        if logistics:
+            logistics_basic = logistics.get_basic_info()
+            logistics_res = {
+                'com': logistics_basic.get('com'),
+                'nu': logistics_basic.get('nu'),
+            }
+            logistics_data = logistics_basic.get('data')
+            if logistics_data:
+                logistics_res['data'] = json.loads(logistics_data)
+            basic_data['logistics'] = logistics_res
+
         return basic_data
 
     @check_token

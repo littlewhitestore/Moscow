@@ -446,7 +446,7 @@ class OrderLogistics(object):
             "number": self.__model_obj.nu,
             "key": "VBTKOCdI7267",
             "parameters": {
-                "callbackurl": 'https://www.xiaobaidiandev.com/orders/%s/logistics' % self.__model_obj.order_sn
+                "callbackurl": 'https://www.xiaobaidiandev.com/api/orders/%s/logistics' % self.__model_obj.order_sn
             }
         }
         data = {
