@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 from django.conf import settings
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import views
 import xmltodict
@@ -12,6 +13,8 @@ from common.services.order import Order
 from common.services.settlement.buynow import BuyNowSettlementService
 from .decorators import check_token, login_required
 from .response import ApiJsonResponse, ApiResponseStatusCode
+
+import json
 
 class Sku(object):
     sku_id = 100000
@@ -28,7 +31,7 @@ class BuyNowOrderView(views.APIView):
         sku_id = request.data.get('sku_id')
         number = request.data.get('number', 1)
         receiver = request.data.get('receiver', None)
-            
+
         sku = Sku()
         user_obj = request.user_obj
 
@@ -95,8 +98,8 @@ class OrderListView(views.APIView):
     def get(self, request):
         user_obj = request.user_obj
         if user_obj == None:
-            return ApiJsonResponse({}, ApiResponseStatusCode.RELOGIN) 
-        
+            return ApiJsonResponse({}, ApiResponseStatusCode.RELOGIN)
+
         offset = request.data.get('offset', 0)
         count = request.data.get('count', 10)
         order_list = Order.get_order_list(user_obj.id, offset, count)
@@ -139,20 +142,32 @@ class OrderDetailView(views.APIView):
                     receiver_basic.get('address'),
                 ])
             }
+        logistics = order.get_logistics()
+        if logistics:
+            logistics_basic = logistics.get_basic_info()
+            logistics_res = {
+                'com': logistics_basic.get('com_name'),
+                'nu': logistics_basic.get('nu'),
+            }
+            logistics_data = logistics_basic.get('data')
+            if logistics_data:
+                logistics_res['data'] = json.loads(logistics_data)
+            basic_data['logistics'] = logistics_res
+
         return basic_data
 
     @check_token
     def get(self, request, order_id):
         user_obj = request.user_obj
         if user_obj == None:
-            return ApiJsonResponse({}, ApiResponseStatusCode.RELOGIN) 
-        
+            return ApiJsonResponse({}, ApiResponseStatusCode.RELOGIN)
+
         order = Order(order_id)
         data = self.__order_data(order)
-        
+
         if data['user_id'] != user_obj.id:
-            return ApiJsonResponse({}, ApiResponseStatusCode.ERROR, "WRONG USER") 
-            
+            return ApiJsonResponse({}, ApiResponseStatusCode.ERROR, "WRONG USER")
+
         return ApiJsonResponse(data)
 
 class WeixinResponse(object):
@@ -181,3 +196,26 @@ def weixin_pay_cb(request, order_id):
         order.pay(out_trade_no)
         return HttpResponse(WeixinResponse())
     return HttpResponse(WeixinResponse(code="FAIL", msg="WEIXIN FAIL"))
+
+@csrf_exempt
+def delivery(request, order_sn):
+    data = json.loads(request.POST.get('param'))
+    status = data.get('status', 'polling')
+    message = data.get('message', '')
+    last_result = data.get('lastResult')
+    if last_result is not None:
+        ischeck = True if last_result.get('ischeck') == "1" else False
+        com = last_result.get('com')
+        nu = last_result.get('nu')
+        logistics_data = last_result.get('data')
+        order = Order.get_order_by_sn(order_sn)
+        if order:
+            order.refresh_logistics(com, nu, json.dumps(logistics_data), is_check=ischeck)
+
+    data = {
+        "result": "true",
+        "returnCode": "200",
+        "message": "成功"
+    }
+
+    return JsonResponse(data)

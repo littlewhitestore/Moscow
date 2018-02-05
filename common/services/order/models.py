@@ -24,7 +24,7 @@ class Order(models.Model):
             city,
             district,
             address):
-        
+
         OrderReceiver.objects.create(
             order=self,
             name=name,
@@ -78,3 +78,26 @@ class OrderTrade(models.Model):
 
     class Meta:
         db_table = 'order_trade'
+
+class OrderLogistics(models.Model):
+    id = models.AutoField(primary_key=True)
+    order_sn = models.CharField(max_length=32, unique=True)
+    com = models.CharField(max_length=32)
+    nu = models.CharField(max_length=32)
+    data = models.TextField()
+    created_time = models.DateTimeField(auto_now_add=True)
+    updated_time = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'order_logistics'
+
+ExpressCompany = {
+    'shunfeng': "顺丰快递",
+    'quanritongkuaidi': "全日通",
+    'yuantong': "圆通快递",
+    'zhongtong': "中通快递",
+    'shentong': "申通快递",
+    'tiantian': "天天快递",
+    'quanfengkuaidi': "全峰快递",
+    'yunda': "韵达快递",
+}
