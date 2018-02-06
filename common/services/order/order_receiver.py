@@ -1,7 +1,5 @@
 # *-* coding:utf-8 *-*
-from .models import Order as OrderModel
-from .models import OrderReceiver as OrderReceiverModel
-
+from .models import OrderReceiverModel
 
 class OrderReceiver(object):
     def __init__(self, pk, order_receiver_model_obj=None):

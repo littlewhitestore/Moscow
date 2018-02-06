@@ -1,6 +1,7 @@
 # *-* coding:utf-8 *-*
-from .models import Order as OrderModel
+from .models import OrderModel
 from .order_item import OrderItem
+from .order_logistics import OrderLogistics
 from .order_receiver import OrderReceiver
 from .order_trade import OrderTrade
 from .snowflake import sn
@@ -27,6 +28,7 @@ class Order(object):
         self.order_id = order_id
         self.__model_obj = model_obj
         self.__receiver = None
+        self.__logistics = None
         self.__order_items = []
 
     @classmethod
@@ -39,6 +41,14 @@ class Order(object):
     def get_status_text(self):
         self.__confirm_order_model()
         return OrderStatus.dict().get(self.__model_obj.order_status, '')
+
+    @classmethod
+    def get_order_by_sn(cls, order_sn):
+        try:
+            model_obj = OrderModel.objects.get(order_sn=order_sn)
+            return cls(model_obj.pk, model_obj=model_obj)
+        except OrderModel.DoesNotExist:
+            return None
 
     @classmethod
     def create(cls, user_id, check_list):
@@ -124,6 +134,11 @@ class Order(object):
             except OrderModel.DoesNotExist:
                 pass
 
+    def __confirm_logistics(self):
+        if self.__logistics is None:
+            self.__confirm_order_model()
+            self.__logistics = OrderLogistics.get_order_logistics(self.__model_obj.order_sn)
+
     def __confirm_order_item_list(self):
         if not self.__order_items:
             self.__confirm_order_model()
@@ -196,4 +211,41 @@ class Order(object):
         order_trade = OrderTrade.create(self.__model_obj.order_sn,
                 self.__model_obj.amount_payable)
         return order_trade
+
+    def get_logistics(self):
+        self.__confirm_logistics()
+        return self.__logistics
+
+
+    def delivery(self, com, nu):
+        '''
+        订单发货
+
+        参数:
+        @param com: 物流公司对应的快递100的code
+        @param nu:  物流单号
+        '''
+        self.__confirm_logistics()
+        if self.__logistics is None:
+            self.__logistics = OrderLogistics.create(self.__model_obj.order_sn,
+                    com, nu)
+            self.set_pending_receive()
+
+    def delivery_and_subscribe(self, com, nu):
+        self.delivery(com, nu)
+        self.__confirm_logistics()
+        self.__logistics.subscribe()
+
+    def refresh_logistics(self, com, nu, logistics_data, is_check=False):
+        '''
+        更新订单的物流信息
+        '''
+        self.__confirm_logistics()
+        logistics_basic_info = self.__logistics.get_basic_info()
+        _com = logistics_basic_info.get('com')
+        _nu = logistics_basic_info.get('nu')
+        if com == _com and nu == _nu:
+            self.__logistics.refresh(logistics_data)
+            if is_check:
+                self.set_finish()
 

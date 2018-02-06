@@ -1,11 +1,7 @@
 # *-* coding:utf-8 *-*
-
-import datetime
+import datetime 
 import random
-
-from .models import OrderTrade as OrderTradeModel
-
-from .snowflake import sn
+from .models import OrderTradeModel
 
 class TradeStatus(object):
     SUCCESS = 1
@@ -56,3 +52,4 @@ class OrderTrade(object):
         if self.__model_obj:
             self.__model_obj.trade_status = TradeStatus.SUCCESS
             self.__model_obj.save()
+

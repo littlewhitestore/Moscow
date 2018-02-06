@@ -1,6 +1,5 @@
 # *-* coding:utf-8 *-*
-
-from .models import OrderItem as OrderItemModel
+from .models import OrderItemModel
 
 class OrderItem(object):
     def __init__(self, order_item_id, model_obj=None):
@@ -17,6 +16,7 @@ class OrderItem(object):
     @classmethod
     def get_order_item_list(cls, order_sn):
         order_item_model_list = OrderItemModel.objects.filter(order_sn=order_sn)
+        print order_item_model_list
         order_item_list = map(lambda _m:cls(_m.pk, model_obj=_m), order_item_model_list)
         return order_item_list
 

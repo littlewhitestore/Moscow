@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-class Order(models.Model):
+class OrderModel(models.Model):
     id = models.AutoField(primary_key=True)
     order_sn = models.CharField(max_length=32, unique=True)
     user_id = models.IntegerField()
@@ -35,7 +35,7 @@ class Order(models.Model):
             address=address
         )
 
-class OrderItem(models.Model):
+class OrderItemModel(models.Model):
     id = models.AutoField(primary_key=True)
     order_sn = models.CharField(max_length=32)
     goods_id = models.IntegerField()
@@ -51,7 +51,7 @@ class OrderItem(models.Model):
         db_table = 'order_item'
 
 
-class OrderReceiver(models.Model):
+class OrderReceiverModel(models.Model):
     id = models.AutoField(primary_key=True)
     order_sn = models.CharField(max_length=32)
     name = models.CharField(max_length=32, blank=True)
@@ -67,7 +67,7 @@ class OrderReceiver(models.Model):
     class Meta:
         db_table = 'order_receiver'
 
-class OrderTrade(models.Model):
+class OrderTradeModel(models.Model):
     id = models.AutoField(primary_key=True)
     order_sn = models.CharField(max_length=32)
     trade_no = models.CharField(max_length=32)
@@ -79,7 +79,7 @@ class OrderTrade(models.Model):
     class Meta:
         db_table = 'order_trade'
 
-class OrderLogistics(models.Model):
+class OrderLogisticsModel(models.Model):
     id = models.AutoField(primary_key=True)
     order_sn = models.CharField(max_length=32, unique=True)
     com = models.CharField(max_length=32)
