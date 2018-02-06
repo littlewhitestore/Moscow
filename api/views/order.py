@@ -22,16 +22,15 @@ class BuyNowOrderView(views.APIView):
     @login_required
     def post(self, request):
         print request.data
-        sku_id = request.data.get('sku_id')
+        sku_id = request.data.get('product_id')
         number = int(request.data.get('number', '1'))
         receiver = request.data.get('receiver', None)
         
-        print sku_id
         receiver = receiver
-        item_list = {
+        item_list = [{
             'sku_id': int(sku_id),
             'number': number 
-        }
+        }]
         goods_obj = Goods.fetch_by_sku(sku_id)
         sku_info = goods_obj.get_sku_info(sku_id)
         total_amount = sku_info['price'] * number 

@@ -37,6 +37,7 @@ class OrderModel(models.Model):
 
 class OrderItemModel(models.Model):
     id = models.AutoField(primary_key=True)
+    order_id = models.IntegerField(null=False, db_index=True)
     order_sn = models.CharField(max_length=32)
     goods_id = models.IntegerField()
     goods_name = models.CharField(max_length=64, blank=True)
@@ -53,6 +54,7 @@ class OrderItemModel(models.Model):
 
 class OrderReceiverModel(models.Model):
     id = models.AutoField(primary_key=True)
+    order_id = models.IntegerField(null=False, db_index=True)
     order_sn = models.CharField(max_length=32)
     name = models.CharField(max_length=32, blank=True)
     province = models.CharField(max_length=32, blank=True)
@@ -69,6 +71,7 @@ class OrderReceiverModel(models.Model):
 
 class OrderTradeModel(models.Model):
     id = models.AutoField(primary_key=True)
+    order_id = models.IntegerField(null=False, db_index=True)
     order_sn = models.CharField(max_length=32)
     trade_no = models.CharField(max_length=32)
     trade_amount = models.IntegerField(default=0)
@@ -81,6 +84,7 @@ class OrderTradeModel(models.Model):
 
 class OrderLogisticsModel(models.Model):
     id = models.AutoField(primary_key=True)
+    order_id = models.IntegerField(null=False, db_index=True)
     order_sn = models.CharField(max_length=32, unique=True)
     com = models.CharField(max_length=32)
     nu = models.CharField(max_length=32)

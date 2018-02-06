@@ -17,8 +17,9 @@ class OrderLogistics(object):
                 pass
 
     @classmethod
-    def create(cls, order_sn, com, nu):
+    def create(cls, order_id, order_sn, com, nu):
         model_obj = OrderLogisticsModel.objects.create(
+                order_id=order_id,
                 order_sn=order_sn,
                 com=com,
                 nu=nu)

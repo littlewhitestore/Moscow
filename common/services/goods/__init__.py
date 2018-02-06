@@ -96,8 +96,8 @@ class Goods(object):
             
 
     def add_sku(self, image_url, property_vector, price, stock=0, status=1):
-        self.__confirm_goods_sku_model_list()
-        for obj in self.__goods_sku_model_list:
+        self.__confirm_goods_sku_model_dict()
+        for obj in self.__goods_sku_model_dict.values():
             if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
                 raise Exception("property_vector conflict!")
         
@@ -110,7 +110,7 @@ class Goods(object):
             status=status
         )
         obj.save()
-        self.__goods_sku_model_list.append(obj)
+        self.__goods_sku_model_dict[obj.id] = obj
         return obj.id
 
 

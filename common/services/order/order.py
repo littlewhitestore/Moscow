@@ -1,4 +1,5 @@
 # *-* coding:utf-8 *-*
+from common.services.goods import Goods
 from .models import OrderModel
 from .order_item import OrderItem
 from .order_logistics import OrderLogistics
@@ -25,11 +26,16 @@ class OrderStatus(object):
 
 class Order(object):
     def __init__(self, order_id, model_obj=None):
-        self.order_id = order_id
+        self.__order_id = int(order_id)
         self.__model_obj = model_obj
         self.__receiver = None
         self.__logistics = None
         self.__order_items = []
+
+
+    @property
+    def id(self):
+        return self.__order_id
 
     @classmethod
     def get_order_list(cls, user_id, offset, count):
@@ -89,7 +95,7 @@ class Order(object):
                 number
             )
         
-        order.set_receiver(
+        order_obj.set_receiver(
             receiver.get('name'),
             receiver.get('province'),
             receiver.get('city'),
@@ -99,7 +105,7 @@ class Order(object):
             receiver.get('zipcode', ''),
         )
 
-        return order
+        return order_obj
 
     def pay(self, trade_no):
         order_trade = OrderTrade.from_trade_no(trade_no)
@@ -143,7 +149,7 @@ class Order(object):
     def __confirm_order_model(self):
         if self.__model_obj is None:
             try:
-                self.__model_obj = OrderModel.objects.get(pk=self.order_id)
+                self.__model_obj = OrderModel.objects.get(pk=self.id)
             except OrderModel.DoesNotExist:
                 pass
 
@@ -182,14 +188,16 @@ class Order(object):
         '''
         self.__confirm_order_model()
         self.__receiver = OrderReceiver.create(
-                self.__model_obj.order_sn,
-                name,
-                province,
-                city,
-                district,
-                address,
-                mobile,
-                zipcode)
+            self.id,
+            self.__model_obj.order_sn,
+            name,
+            province,
+            city,
+            district,
+            address,
+            mobile,
+            zipcode
+        )
 
     def get_receiver(self):
         '''
@@ -208,6 +216,7 @@ class Order(object):
     def add_order_item(self, goods_id, sku_id, goods_name, sku_property, sale_price, number):
         self.__confirm_order_model()
         order_item_obj = OrderItem.create(
+            self.id,
             self.__model_obj.order_sn,
             goods_id,
             sku_id,
@@ -220,8 +229,11 @@ class Order(object):
 
     def apply_trade(self):
         self.__confirm_order_model()
-        order_trade = OrderTrade.create(self.__model_obj.order_sn,
-                self.__model_obj.amount_payable)
+        order_trade = OrderTrade.create(
+            self.id,
+            self.__model_obj.order_sn,
+            self.__model_obj.amount_payable
+        )
         return order_trade
 
     def get_logistics(self):
