@@ -51,40 +51,53 @@ class Order(object):
             return None
 
     @classmethod
-    def create(cls, user_id, check_list):
+    def create(cls, user_id, receiver, item_list, total_amount, amount_payable, postage=0):
         '''
         创建订单
 
         参数:
         @param user_id 用户ID
-        @param check_list 结算系统生成的结算清单
+        @param item_list  
+        @param total_amount 
+        @param amount_payable 
+        @param postage 
         '''
-        total_amount = check_list.total_amount
-        amount_payable = check_list.amount_payable
-        postage = check_list.postage
+        total_amount = total_amount
+        amount_payable = amount_payable
+        postage = postage 
+        
         order_model = OrderModel.objects.create(
-                order_sn='18' + str(sn()),
-                user_id=user_id,
-                total_amount=total_amount,
-                amount_payable=amount_payable,
-                postage=postage)
-        order =  cls(order_model.pk, model_obj=order_model)
-        for item in check_list.sku_list:
-            order.add_order_item(item.sku.goods_id,
-                    item.sku.sku_id,
-                    item.sku.name,
-                    item.sku.market_price,
-                    item.sku.price,
-                    item.number)
-        receiver = check_list.receiver
-        order.set_receiver(receiver.get('name'),
-                receiver.get('province'),
-                receiver.get('city'),
-                receiver.get('district'),
-                receiver.get('address'),
-                receiver.get('mobile'),
-                receiver.get('zipcode', ''),
+            order_sn='18' + str(sn()),
+            user_id=user_id,
+            total_amount=total_amount,
+            amount_payable=amount_payable,
+            postage=postage
+        )
+        order_obj = cls(order_model.pk, model_obj=order_model)
+        
+        for item in item_list:
+            sku_id = item['sku_id']
+            number = item['number']
+            goods_obj = Goods.fetch_by_sku(sku_id)
+            sku_info = goods_obj.get_sku_info(sku_id)
+            order_obj.add_order_item(
+                sku_info['goods_id'],
+                sku_info['id'],
+                sku_info['goods_name'],
+                sku_info['property'],
+                sku_info['price'],
+                number
             )
+        
+        order.set_receiver(
+            receiver.get('name'),
+            receiver.get('province'),
+            receiver.get('city'),
+            receiver.get('district'),
+            receiver.get('address'),
+            receiver.get('mobile'),
+            receiver.get('zipcode', ''),
+        )
 
         return order
 
@@ -192,19 +205,18 @@ class Order(object):
         self.__confirm_order_item_list()
         return self.__order_items
 
-    def add_order_item(self, goods_id, sku_id, sku_name,
-            market_price,
-            sale_price,
-            number):
+    def add_order_item(self, goods_id, sku_id, goods_name, sku_property, sale_price, number):
         self.__confirm_order_model()
-        order_item = OrderItem.create(
-                self.__model_obj.order_sn,
-                goods_id,
-                sku_id,
-                sku_name,
-                market_price,
-                sale_price,
-                number)
+        order_item_obj = OrderItem.create(
+            self.__model_obj.order_sn,
+            goods_id,
+            sku_id,
+            goods_name,
+            sku_property,
+            sale_price,
+            number
+        )
+        return order_item_obj.id
 
     def apply_trade(self):
         self.__confirm_order_model()

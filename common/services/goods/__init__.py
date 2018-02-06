@@ -13,7 +13,7 @@ class Goods(object):
         self.__goods_model_obj = goods_model_obj
         self.__goods_banner_image_list = None
         self.__goods_detail_image_list = None
-        self.__goods_sku_model_list = None
+        self.__goods_sku_model_dict = None
 
     def __confirm_goods_obj(self):
         if self.__goods_model_obj == None:
@@ -31,11 +31,11 @@ class Goods(object):
             for obj in GoodsBannerImageModel.objects.filter(goods_id=self.id).order_by('sort'):
                 self.__goods_detail_image_list.append(obj.url)
     
-    def __confirm_goods_sku_model_list(self):
-        if self.__goods_sku_model_list == None:
-            self.__goods_sku_model_list = []
+    def __confirm_goods_sku_model_dict(self):
+        if self.__goods_sku_model_dict == None:
+            self.__goods_sku_model_dict = {}
             for obj in GoodsSkuModel.objects.filter(goods_id=self.id, status=1).order_by('created_time'):
-                self.__goods_sku_model_list.append(obj)
+                self.__goods_sku_model_dict[obj.id] = obj
 
     def __is_property_vector_conflict(self, pv_a, pv_b):
         if len(pv_a) != len(pv_b):
@@ -51,27 +51,7 @@ class Goods(object):
         if flag_same_value == True:
             return True
         return False
-
     
-    def add_sku(self, image_url, property_vector, price, stock=0, status=1):
-        self.__confirm_goods_sku_model_list()
-        for obj in self.__goods_sku_model_list:
-            if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
-                raise Exception("property_vector conflict!")
-        
-        obj = GoodsSkuModel(
-            goods_id=self.id,
-            image_url=image_url,
-            property_vector=json.dumps(property_vector),
-            price=price,
-            stock=stock,
-            status=status
-        )
-        obj.save()
-        self.__goods_sku_model_list.append(obj)
-        return obj.id
-
-
     @property
     def id(self):
         return self.__id
@@ -105,8 +85,33 @@ class Goods(object):
         for goods_model_obj in GoodsModel.objects.filter(status=1).order_by('-created_time')[offset : offset + count]:
             goods_obj_list.append(cls(goods_model_obj.id, goods_model_obj))
         return goods_obj_list
+
+
+    @classmethod
+    def fetch_by_sku(cls, sku_id):
+        sku_id = int(sku_id)
+        goods_sku_obj = GoodsSkuModel.objects.get(pk=sku_id)
+        goods_id = goods_sku_obj.goods_id
+        return cls(goods_id)
             
 
+    def add_sku(self, image_url, property_vector, price, stock=0, status=1):
+        self.__confirm_goods_sku_model_list()
+        for obj in self.__goods_sku_model_list:
+            if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
+                raise Exception("property_vector conflict!")
+        
+        obj = GoodsSkuModel(
+            goods_id=self.id,
+            image_url=image_url,
+            property_vector=json.dumps(property_vector),
+            price=price,
+            stock=stock,
+            status=status
+        )
+        obj.save()
+        self.__goods_sku_model_list.append(obj)
+        return obj.id
 
 
     def read(self):
@@ -123,11 +128,37 @@ class Goods(object):
             'detail_image_list': self.__goods_detail_image_list,
         }
         return goods_info
+    
+    def __serialize_sku_property_vector(self, property_vector):
+        property_vector = json.loads(property_vector)
+        property_str_list = []
+        for property_item in property_vector:
+            property_str_list.append(property_item['key'] + ':' + property_item['value'])
+        return ';'.join(property_str_list)
+    
+    def get_sku_info(self, sku_id):
+        sku_id = int(sku_id)
+        self.__confirm_goods_obj()
+        self.__confirm_goods_sku_model_dict()
+        if not self.__goods_sku_model_dict.has_key(sku_id):
+            raise Exception("sku %d is not related to goods %d"%(sku_id, self.id))
+        
+        sku_obj = self.__goods_sku_model_dict[sku_id]
+        sku_info = {
+            'id': sku_obj.id,
+            'goods_id': self.id, 
+            'goods_name': self.__goods_model_obj.name,
+            'price': sku_obj.price, 
+            'image_url': sku_obj.image_url, 
+            'property': self.__serialize_sku_property_vector(sku_obj.property_vector), 
+        }
+        return sku_info
+        
 
     def fetch_sku_all(self):
-        self.__confirm_goods_sku_model_list()
+        self.__confirm_goods_sku_model_dict()
         sku_list = []
-        for sku in self.__goods_sku_model_list:
+        for sku in sorted(self.__goods_sku_model_dict.values(), key=lambda x: x.created_time):
             sku_list.append({
                 'id': sku.id,
                 'image_url': sku.image_url,

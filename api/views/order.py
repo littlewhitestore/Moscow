@@ -8,39 +8,42 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import views
 import xmltodict
 
+from common.services.goods import Goods 
 from common.services.mina.payment import MinaPayment
 from common.services.order import Order
-from common.services.settlement.buynow import BuyNowSettlementService
 from .decorators import check_token, login_required
 from .response import ApiJsonResponse, ApiResponseStatusCode
 
 import json
-
-class Sku(object):
-    sku_id = 100000
-    goods_id = 100001
-    name = '黑色毛衣'
-    market_price = 200
-    price = 1
 
 class BuyNowOrderView(views.APIView):
 
     @check_token
     @login_required
     def post(self, request):
+        print request.data
         sku_id = request.data.get('sku_id')
-        number = request.data.get('number', 1)
+        number = int(request.data.get('number', '1'))
         receiver = request.data.get('receiver', None)
+        
+        print sku_id
+        receiver = receiver
+        item_list = {
+            'sku_id': int(sku_id),
+            'number': number 
+        }
+        goods_obj = Goods.fetch_by_sku(sku_id)
+        sku_info = goods_obj.get_sku_info(sku_id)
+        total_amount = sku_info['price'] * number 
+        amount_payable = total_amount 
 
-        sku = Sku()
-        user_obj = request.user_obj
-
-        settlement_service = BuyNowSettlementService(
-                sku, number, receiver)
-        check_list = settlement_service.settlement()
-
-        order = Order.create(user_obj.id, check_list)
-
+        order = Order.create(
+            user_id=request.user_obj.id, 
+            receiver=receiver,
+            item_list=item_list,
+            total_amount=total_amount,
+            amount_payable=amount_payable
+        )
         order_trade = order.apply_trade()
 
         # 配置是否需要根据APPID更换

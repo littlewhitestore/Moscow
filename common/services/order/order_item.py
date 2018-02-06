@@ -16,22 +16,20 @@ class OrderItem(object):
     @classmethod
     def get_order_item_list(cls, order_sn):
         order_item_model_list = OrderItemModel.objects.filter(order_sn=order_sn)
-        print order_item_model_list
         order_item_list = map(lambda _m:cls(_m.pk, model_obj=_m), order_item_model_list)
         return order_item_list
 
     @classmethod
-    def create(cls, order_sn, goods_id, sku_id,
-            sku_name, market_price, sale_price,
-            number):
+    def create(cls, order_sn, goods_id, sku_id, goods_name, sku_property, sale_price, number):
         order_item_model = OrderItemModel.objects.create(
-                order_sn=order_sn,
-                goods_id=goods_id,
-                sku_id=sku_id,
-                sku_name=sku_name,
-                market_price=market_price,
-                sale_price=sale_price,
-                number=number)
+            order_sn=order_sn,
+            goods_id=goods_id,
+            goods_name=goods_name,
+            sku_id=sku_id,
+            sku_property=sku_property,
+            sale_price=sale_price,
+            number=number
+        )
 
         return cls(order_item_model.pk, order_item_model)
 
@@ -39,10 +37,12 @@ class OrderItem(object):
         self.__confirm_model_obj()
         return {
             'goods_id': self.__model_obj.goods_id,
+            'goods_name': self.__model_obj.goods_name,
             'sku_id': self.__model_obj.sku_id,
+            'sku_property': self.__model_obj.sku_property,
             'number': self.__model_obj.number,
-            'sku_name': self.__model_obj.sku_name,
-            'market_price': self.__model_obj.market_price,
-            'sale_price': self.__model_obj.sale_price
+            'sale_price': self.__model_obj.sale_price,
+            'created_time': self.__model_obj.created_time,
+            'updated_time': self.__model_obj.updated_time
         }
 
