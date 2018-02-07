@@ -30,6 +30,7 @@ global goods_banner_dir
 global goods_desc_dir 
 
 def req_qclooud():
+    print "=================进入req方法"
     # 设置用户属性, 包括secret_id, secret_key, region
     # appid已在配置中移除,请在参数Bucket中带上appid。Bucket由bucketname-appid组成
     secret_id = 'AKIDjOTO9qnlxyoBe2aJB2vmTzKVYVL5m6NT'     # 替换为用户的secret_id
@@ -38,31 +39,20 @@ def req_qclooud():
     token = ''                 # 使用临时秘钥需要传入Token，默认为空,可不填
     config = CosConfig(Region=region, Secret_id=secret_id, Secret_key=secret_key, Token=token)  #获取配置对象
     client = CosS3Client(config)                                                                #获取客户端对象
-
-
-    ############################################################################
-    # 文件操作                                                                 #
-    ############################################################################
-    # 1. 上传单个文件
-    response = client.put_object(
-            Bucket='xiaobaidian-img-001-1255633922',  # Bucket由bucketname-appid组成
-            Body='TY'*1024*512*file_size,
-            Key=file_name,
-            CacheControl='no-cache',
-            ContentDisposition='download.txt'
-    )
-
     # 文件流 简单上传
-    file_name = 'test.txt'
-    with open('test.txt', 'rb') as fp:
-        response = client.put_object(
-            Bucket='test04-123456789',  # Bucket由bucketname-appid组成
-            Body=fp,
-            Key=file_name,
-            StorageClass='STANDARD',
-            CacheControl='no-cache',
-            ContentDisposition='download.txt'
-    )
+    dir_path = '/Users/e/xiaobaike/xiaobai_data'
+    for file in os.listdir(dir_path):
+        if not os.path.isdir(file):
+k           with open(os.path.join(dir_path,file)) as fp:
+                response = client.put_object(
+                        Bucket='xiaobaidian-img-001-1255633922',
+                        Body=fp,
+                        Key=file,
+                        StorageClass='STANDARD',
+                        CacheControl='no-cache',
+                        ContentDisposition=file
+                        )
+    print response    
     print response['ETag']
 
 #判断文件名是否是图片后缀
@@ -125,16 +115,6 @@ def readCsvToData():
         reader = csv.DictReader(csvFile.read().splitlines(), delimiter='\t' )  # 返回的是迭代类型
         col_title = [row for row in reader]
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~"
-#        print type(col_title)
-#        print len(col_title)
-#        print col_title[1]
-#        print col_title[2]
-#        print "测试循环row === %s" %  col_title
-#        col_price = [row['price'] for row in reader]
-#        col_desc = [row['description'] for row in reader]
-#        col_pic = [row['picture'] for row in reader]
-#        col_numid = [row['num_id'] for row in reader]
-#        col_subt = [row['subtitle'] for row in reader]
         for item in col_title:
             print type(item)
             print len(item)
@@ -168,5 +148,4 @@ def parseCsv():
 def prn_obj(obj): 
     print '\n'.join(['%s:%s' % item for item in obj.__dict__.items()]) 
 if __name__ == '__main__':
-    getFile()
-    print readCsvToData()
+    req_qclooud()
