@@ -1,33 +1,12 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
-
-from common.services.settlement.buynow import BuyNowSettlementService
 from rest_framework import views
 
+from common.services.goods import Goods 
 from .decorators import check_token
 from .response import ApiJsonResponse
 
-class Sku(object):
-    sku_id = 100000
-    goods_id = 100001
-    name = '黑色毛衣'
-    market_price = 200
-    price = 1
-
 class BuyNowSettlementView(views.APIView):
-
-    def __item_data(self, item):
-        return {
-            'name': item.sku.name,
-            'attrs': [
-                '颜色:卡其色',
-                '尺码:XL'
-            ],
-            'price': str(item.sku.price), # item.price
-            'thumbnail': '', # 获取sku的缩略图
-            'number': item.number
-        }
 
     @check_token
     def post(self, request):
@@ -35,19 +14,30 @@ class BuyNowSettlementView(views.APIView):
         number = int(request.data.get('number', '1'))
         receiver = request.data.get('receiver', None)
 
-        # 通过sku_id获取sku信息
-        sku = Sku()
-
-        service = BuyNowSettlementService(
-                sku, number, receiver)
-        check_list = service.settlement()
-        data = {
-            'items': [self.__item_data(i) for i in check_list.sku_list],
-            'total_amount': str(check_list.total_amount),
-            'postage': '包邮',
-            'amount_payable': str(check_list.amount_payable)
+        receiver = receiver
+        goods_obj = Goods.fetch_by_sku(sku_id)
+        sku_info = goods_obj.get_sku_info(sku_id)
+        item = {
+            "sku_id": int(sku_id),
+            "thumbnail": sku_info['image_url'],
+            "price": float(sku_info['price'] / 100.0), 
+            "number": number,
+            "name": sku_info["goods_name"], 
+            "attrs": sku_info['property'].split(';') 
         }
-        if check_list.receiver is not None:
-            data['receiver'] = check_list.receiver
 
+        total_amount = sku_info['price'] * number 
+        amount_payable = total_amount 
+        item_list = [item]
+
+        data = {
+            'items': item_list, 
+            'total_amount': str(float(total_amount / 100.0)),
+            'postage': '包邮',
+            'amount_payable': str(float(amount_payable / 100.0))
+        }
+        if receiver is not None:
+            data['receiver'] = receiver
+        
+        print data
         return ApiJsonResponse(data)
