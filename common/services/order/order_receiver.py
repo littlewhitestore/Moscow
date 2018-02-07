@@ -1,7 +1,5 @@
 # *-* coding:utf-8 *-*
-from .models import Order as OrderModel
-from .models import OrderReceiver as OrderReceiverModel
-
+from .models import OrderReceiverModel
 
 class OrderReceiver(object):
     def __init__(self, pk, order_receiver_model_obj=None):
@@ -26,16 +24,18 @@ class OrderReceiver(object):
                 pass
 
     @classmethod
-    def create(cls, order_sn, name, province, city, district, address, mobile, zipcode=''):
+    def create(cls, order_id, order_sn, name, province, city, district, address, mobile, zipcode=''):
         order_receiver_model = OrderReceiverModel.objects.create(
-                order_sn=order_sn,
-                name=name,
-                province=province,
-                city=city,
-                district=district,
-                address=address,
-                mobile=mobile,
-                zipcode=zipcode)
+            order_id=order_id,
+            order_sn=order_sn,
+            name=name,
+            province=province,
+            city=city,
+            district=district,
+            address=address,
+            mobile=mobile,
+            zipcode=zipcode
+        )
 
         return cls(order_receiver_model.pk, order_receiver_model)
 

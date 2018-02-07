@@ -1,8 +1,8 @@
 # *-* coding:utf-8 *-*
 
 class CheckItem(object):
-    def __init__(self, sku, number):
-        self.sku = sku
+    def __init__(self, sku_id, number):
+        self.sku = sku_id
         self.number = number
 
 class CheckList(object):
@@ -23,8 +23,8 @@ class CheckList(object):
         self.total_amount += sku.price * number
 
 class BuyNowSettlementService(object):
-    def __init__(self, sku, number, receiver=None):
-        self.sku = sku
+    def __init__(self, sku_id, number, receiver=None):
+        self.sku_id = sku_id
         self.number = number
         self.receiver = receiver
 
@@ -36,7 +36,7 @@ class BuyNowSettlementService(object):
         return self.check_list
 
     def __calc_total_amount(self):
-        self.check_list.check_sku(self.sku, self.number)
+        self.check_list.check_sku(self.sku_id, self.number)
         self.check_list.amount_payable = self.check_list.total_amount
 
     def __is_free_postage(self):

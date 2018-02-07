@@ -1,11 +1,7 @@
 # *-* coding:utf-8 *-*
-
-import datetime
+import datetime 
 import random
-
-from .models import OrderTrade as OrderTradeModel
-
-from .snowflake import sn
+from .models import OrderTradeModel
 
 class TradeStatus(object):
     SUCCESS = 1
@@ -16,15 +12,17 @@ class OrderTrade(object):
         self.__model_obj = model_obj
 
     @classmethod
-    def create(cls, order_sn, trade_amount):
+    def create(cls, order_id, order_sn, trade_amount):
         #TODO 当前逻辑可能生成重复交易号
         prefix = datetime.datetime.now().strftime("%Y%m%d")
         random_no = str(random.randint(1000000000, 9999999999))
         trade_no = "%s%s" % (prefix, random_no)
         order_trade_model = OrderTradeModel.objects.create(
-                trade_no=trade_no,
-                order_sn=order_sn,
-                trade_amount=trade_amount)
+            order_id=order_id,
+            order_sn=order_sn,
+            trade_no=trade_no,
+            trade_amount=trade_amount
+        )
         return cls(order_trade_model.pk, order_trade_model)
 
     @classmethod
@@ -56,3 +54,4 @@ class OrderTrade(object):
         if self.__model_obj:
             self.__model_obj.trade_status = TradeStatus.SUCCESS
             self.__model_obj.save()
+
