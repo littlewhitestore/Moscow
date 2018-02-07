@@ -21,8 +21,7 @@ class BuyNowOrderView(views.APIView):
     @check_token
     @login_required
     def post(self, request):
-        print request.data
-        sku_id = request.data.get('product_id')
+        sku_id = request.data.get('sku_id')
         number = int(request.data.get('number', '1'))
         receiver = request.data.get('receiver', None)
         
