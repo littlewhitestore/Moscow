@@ -88,8 +88,9 @@ class User(object):
     
     def get_wx_encrypted_data(self, encryptedData, iv):
         self.__confirm_user_obj()
-
-        pc = WXBizDataCrypt(settings.WECHAT_APP_ID, self.__user_model_obj.wx_session_key)
+        
+        wechat_app_id = settings.ENTRY_CONFIG[self.entry]['WECHAT_APP_ID']
+        pc = WXBizDataCrypt(wechat_app_id, self.__user_model_obj.wx_session_key)
         data = pc.decrypt(encryptedData, iv)
         
         if data.has_key('unionId'):
