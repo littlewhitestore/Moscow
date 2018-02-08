@@ -23,11 +23,6 @@ class fileObj(object):
         self.desc_img_url = []
         self.desc_string = []
         self.stock = 1000
-global file_csv_path 
-global file_csv_modify_path
-file_csv_modify_path = "/Users/e/xiaobaike/xiaobaike_data/商品信息 0201.xlsx"
-global goods_banner_dir 
-global goods_desc_dir 
 
 def req_qclooud():
     print "=================进入req方法"
@@ -42,9 +37,10 @@ def req_qclooud():
     # 文件流 简单上传
     dir_path = '/Users/e/xiaobaike/xiaobai_data'
     for file in os.listdir(dir_path):
-        if not os.path.isdir(file):
-k           with open(os.path.join(dir_path,file)) as fp:
-                response = client.put_object(
+        if (not os.path.isdir(os.path.join(dir_path,file))) and is_img(os.path.splitext(file)[1]):
+            with open(os.path.join(dir_path,file)) as fp:
+                try:
+                    response = client.put_object(
                         Bucket='xiaobaidian-img-001-1255633922',
                         Body=fp,
                         Key=file,
@@ -52,8 +48,16 @@ k           with open(os.path.join(dir_path,file)) as fp:
                         CacheControl='no-cache',
                         ContentDisposition=file
                         )
-    print response    
-    print response['ETag']
+                    if(response):
+                        print(str(os.listdir(dir_path).index(file))+"/"+str(len(os.listdir(dir_path))-1))
+                        print("图片"+file+"==上传成功")
+                        
+                except Exception, e  :
+                    print(str(os.listdir(dir_path).index(file))+"上传失败")
+                    prn_obj(e)
+        else :
+            print(str(os.listdir(dir_path).index(file))+"="+file +"是非图片文件或者文件夹")
+    print ('文件上传任务执行结束')
 
 #判断文件名是否是图片后缀
 def is_img(ext):
@@ -69,43 +73,6 @@ def is_img(ext):
     else:
         return False
 
-def getFile():
-    file_path = "."
-    root_files = os.walk(file_path)
-    global file_csv_path
-    global goods_banner_dir
-    global goods_desc_dir
-    
-    i = 0
-    first_dir = 0
-    
-    for roots,dirs,files in root_files:
-        i+=1
-        dir_lv = roots.count("/")
-        if i==1:
-            first_dir = dir_lv
-            print "进入第一层文件循环"
-            #第一级目前 包含 cvs与图片初级目录
-            for csv_file in files:
-                print "遍历files= %s" % csv_file
-                if not csv_file.startswith('.'):
-                    file_csv_path = roots +"/" +csv_file
-                    print "file_csv_path结果 ====%s" %  file_csv_path
-
-        elif (dir_lv - first_dir ==1) :
-            #第二级目录 包含 contentPic文件夹 .tbi图片
-            goods_banner_dir = roots
-            print goods_banner_dir
-
-        elif (dir_lv - first_dir ==2) :
-            #第二级目录 包含 一个商品名称的目录
-            goods_desc_dir = roots
-            print goods_desc_dir
-            print dirs
-#        elif (dir_lv - first_dir ==3) :
-            #第三级目录 包含 商品详情的图文文件 
-# print dirs    
-#        print "减掉后的层次==%s" %(dir_lv - first_dir)
 def readCsvToData():
 # 读取csv文件方式1
     global file_csv_path
@@ -130,14 +97,6 @@ def readCsvToData():
                 banner_img = goods_banner_dir + pic_str_c.split(':')[0]                          
                 file_obj.banner_url.append(banner_img)
             prn_obj(file_obj)
-#            print "img_string = %s" % img_string
-            banner_url = []
-            desc_img_url = []
-            desc_string = []
-#    print "price= %s" % col_price
-#    print "desc= %s" % col_desc
-#    print "pic= %s" % col_pic
-#    print "numid= %s" % col_numid
     csvFile.close()
     data = []
     return data
