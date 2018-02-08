@@ -6,14 +6,21 @@ from .response import ApiJsonResponse, ApiResponseStatusCode
 
 def check_token(func):
     def wrapper(self, request, *args, **kwargs):
+        entry = None
         token = None
         if request.method == 'GET': 
             token = request.GET.get('token', None)
+            entry = request.GET.get('entry', None)
         elif request.method == 'POST':
             token = request.data.get('token', None)
+            entry = request.data.get('entry', None)
         else:
             raise Exception('object type %s has no GET nor POST attribute.'%type(request))
-        request.user_obj = User.fetch_user_by_token(token)  
+        
+        if entry == None:
+            raise Exception('failed to get entry.')
+        
+        request.user_obj = User.fetch_user_by_token(entry, token)  
         return func(self, request, *args, **kwargs)
     return wrapper
 

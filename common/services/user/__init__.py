@@ -22,6 +22,11 @@ class User(object):
         return self.__id
 
     @property
+    def entry(self):
+        self.__confirm_user_obj()
+        return self.__user_model_obj.entry
+    
+    @property
     def token(self):
         self.__confirm_user_obj()
         return self.__user_model_obj.token
@@ -32,9 +37,12 @@ class User(object):
         return self.__user_model_obj.wx_openid
 
     @classmethod
-    def fetch_user_by_wx_openid(cls, openid):
+    def fetch_user_by_wx_openid(cls, entry, openid):
         try:
-            user_model_obj = UserModel.objects.get(wx_openid=openid)
+            user_model_obj = UserModel.objects.get(
+                entry=entry,
+                wx_openid=openid
+            )
             obj = cls(user_model_obj.id, user_model_obj)
             return obj
         except Exception:
@@ -42,9 +50,11 @@ class User(object):
         return None
 
     @classmethod
-    def fetch_user_by_token(cls, token):
+    def fetch_user_by_token(cls, entry, token):
         try:
-            user_model_obj = UserModel.objects.get(token=token)
+            user_model_obj = UserModel.objects.get(
+                token=token
+            )
             obj = cls(user_model_obj.id, user_model_obj)
             return obj
         except Exception:
@@ -52,8 +62,9 @@ class User(object):
         return None
 
     @classmethod
-    def create(cls, wx_openid, wx_session_key):
+    def create(cls, entry, wx_openid, wx_session_key):
         user_model_obj = UserModel(
+            entry=entry,
             wx_openid=wx_openid,
             wx_session_key=wx_session_key
         )
@@ -65,6 +76,7 @@ class User(object):
         self.__confirm_user_obj()
 
         info_str = str(self.id) + str(datetime.datetime.now()) + self.__user_model_obj.wx_openid
+        info_str = self.__user_model_obj.entry + info_str
         if additional_info != None:
             info_str += additional_info
         hash_md5_obj = hashlib.md5(info_str)
