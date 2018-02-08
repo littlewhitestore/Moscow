@@ -45,13 +45,14 @@ class BuyNowOrderView(views.APIView):
         order_trade = order.apply_trade()
 
         # 配置是否需要根据APPID更换
+        entry = request.entry
         trade_basic_info = order_trade.get_basic_info()
         order_basic_info = order.get_order_basic_info()
         mina_payment = MinaPayment(
-            settings.WECHAT_APP_ID,
-            settings.WECHAT_APP_SECRET,
-            settings.WXPAY_MCH_ID,
-            settings.WXPAY_API_KEY,
+            settings.ENTRY_CONFIG[entry]['WECHAT_APP_ID'],
+            settings.ENTRY_CONFIG[entry]['WECHAT_APP_SECRET'],
+            settings.ENTRY_CONFIG[entry]['WXPAY_MCH_ID'],
+            settings.ENTRY_CONFIG[entry]['WXPAY_API_KEY'],
         )
         trade_no = trade_basic_info.get('trade_no')
         trade_amount = trade_basic_info.get('trade_amount')
