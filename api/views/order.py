@@ -73,6 +73,8 @@ class BuyNowOrderView(views.APIView):
         return ApiJsonResponse(data)
 
 class OrderListView(views.APIView):
+    
+    
     def __order_data(self, order):
         order_basic_info = order.get_order_basic_info()
         basic_data = {
@@ -86,12 +88,15 @@ class OrderListView(views.APIView):
         items = []
         for order_item in order_items:
             item_basic = order_item.get_basic_info()
+            sku_id = item_basic['sku_id']
+            goods_obj = Goods.fetch_by_sku(sku_id)
+            sku_info = goods_obj.get_sku_info(sku_id)
             items.append({
-                'thumbnail': '#TODO获取sku的缩略图',
-                'sku_name': item_basic.get('sku_name'),
-                'number': item_basic.get('number'),
-                'attrs': ['颜色:卡其色', '尺寸: XL'],
-                'sale_price': item_basic.get('sale_price')
+                'thumbnail': sku_info['image_url'], 
+                'sku_name': item_basic['goods_name'],
+                'number': item_basic['number'],
+                'attrs': item_basic['sku_property'], 
+                'sale_price': item_basic['sale_price']
             })
         basic_data['items'] = items
         return basic_data
@@ -106,6 +111,7 @@ class OrderListView(views.APIView):
         count = request.data.get('count', 10)
         order_list = Order.get_order_list(user_obj.id, offset, count)
         order_data = map(lambda _o: self.__order_data(_o), order_list)
+        print order_data
         return ApiJsonResponse(order_data)
 
 class OrderDetailView(views.APIView):
