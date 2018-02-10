@@ -39,5 +39,4 @@ class BuyNowSettlementView(views.APIView):
         if receiver is not None:
             data['receiver'] = receiver
         
-        print data
         return ApiJsonResponse(data)
