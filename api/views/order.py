@@ -82,7 +82,7 @@ class OrderListView(views.APIView):
             'status_desc': order.get_status_text(),
             'order_sn': order_basic_info.get('order_sn'),      # 订单号
             'postage': order_basic_info.get('postage'),        # 邮费
-            'amount_payable': order_basic_info.get('amount_payable'), # 订单金额
+            'amount_payable': float(order_basic_info.get('amount_payable')) / 100.0, # 订单金额
         }
         order_items = order.get_order_item_list()
         items = []
@@ -96,7 +96,7 @@ class OrderListView(views.APIView):
                 'sku_name': item_basic['goods_name'],
                 'number': item_basic['number'],
                 'attrs': item_basic['sku_property'], 
-                'sale_price': item_basic['sale_price']
+                'sale_price': float(item_basic['sale_price']) / 100.0
             })
         basic_data['items'] = items
         return basic_data
@@ -122,7 +122,7 @@ class OrderDetailView(views.APIView):
             'status_desc': order.get_status_text(),
             'order_sn': order_basic_info.get('order_sn'),      # 订单号
             'postage': order_basic_info.get('postage'),        # 邮费
-            'amount_payable': order_basic_info.get('amount_payable'), # 订单金额
+            'amount_payable': float(order_basic_info.get('amount_payable')) / 100.0, # 订单金额
         }
         order_items = order.get_order_item_list()
         items = []
@@ -136,7 +136,7 @@ class OrderDetailView(views.APIView):
                 'sku_name': item_basic['goods_name'],
                 'number': item_basic['number'],
                 'attrs': item_basic['sku_property'], 
-                'sale_price': item_basic['sale_price']
+                'sale_price': float(item_basic['sale_price']) / 100.0
             })
         basic_data['items'] = items
         receiver = order.get_receiver()
