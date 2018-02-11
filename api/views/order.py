@@ -192,7 +192,7 @@ class WeixinResponse(object):
 class WeixinPayCallbackView(views.APIView):
     
     @csrf_exempt
-    def post(request, order_id):
+    def post(self, request, order_id, *args, **kwargs):
         callback_data = xmltodict.parse(request.body).get('xml')
         return_code = callback_data.get('return_code')
         out_trade_no = callback_data.get('out_trade_no')
