@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 from django.conf import settings
 
 from common.services.goods import Goods 
-from common.services.mina.payment import MinaPayment
 from common.services.order import Order
+from minapp_payment import MinappPayment
 
 class SettlementManager(object):
     
@@ -47,7 +47,7 @@ class SettlementManager(object):
 
         trade_basic_info = order_trade.get_basic_info()
         order_basic_info = order.get_order_basic_info()
-        mina_payment = MinaPayment(
+        mina_payment = MinappPayment(
             settings.ENTRY_CONFIG[entry]['WECHAT_APP_ID'],
             settings.ENTRY_CONFIG[entry]['WECHAT_APP_SECRET'],
             settings.ENTRY_CONFIG[entry]['WXPAY_MCH_ID'],
