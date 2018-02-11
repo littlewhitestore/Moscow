@@ -4,6 +4,7 @@ import random
 from .models import OrderTradeModel
 
 class TradeStatus(object):
+    PENDING_PAY = 0
     SUCCESS = 1
 
 class OrderTrade(object):
@@ -28,8 +29,7 @@ class OrderTrade(object):
     @classmethod
     def from_trade_no(cls, trade_no):
         try:
-            order_trade_model = OrderTradeModel.objects.get(
-                    trade_no=trade_no)
+            order_trade_model = OrderTradeModel.objects.get(trade_no=trade_no)
             return cls(order_trade_model.pk, order_trade_model)
         except OrderTradeModel.DoesNotExist:
             return None
@@ -37,8 +37,7 @@ class OrderTrade(object):
     def __confirm_model_obj(self):
         if self.__model_obj is None:
             try:
-                self.__model_obj = OrderTradeModel.objects.get(
-                        pk=self.pk)
+                self.__model_obj = OrderTradeModel.objects.get(pk=self.pk)
             except OrderTradeModel.DoesNotExist:
                 pass
 

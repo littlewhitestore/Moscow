@@ -3,7 +3,7 @@ import views
 
 urlpatterns = [
     url(r'^cart$', views.Cart.as_view()),
-    url(r'^settlement$', views.BuyNowSettlementView.as_view()),
+    url(r'^settlement/buynow$', views.BuyNowSettlementView.as_view()),
     url(r'^order/buynow$', views.BuyNowOrderView.as_view()),
     url(r'^orders$', views.OrderListView.as_view()),
     url(r'^orders/(?P<order_id>\d+)$', views.OrderDetailView.as_view()),
@@ -14,7 +14,7 @@ urlpatterns = [
     url(r'^home$', views.Home.as_view()),
     url(r'^home/banner/upload$', views.HomeBannerUpload.as_view()),
     url(r'^login$', views.Login.as_view()),
-    url(r'^orders/(?P<order_id>\d+)/payment$', views.weixin_pay_cb),
+    url(r'^orders/(?P<order_id>\d+)/pay/success$', views.weixin_pay_callback),
     url(r'^orders/(?P<order_sn>\d+)/logistics$', views.delivery),
     url(r'^wechat/user/info/upload$', views.WXUserInfoUpload.as_view()),
 ]
