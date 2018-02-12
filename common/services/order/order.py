@@ -1,5 +1,8 @@
 # *-* coding:utf-8 *-*
+from django.conf import settings
+
 from common.services.goods import Goods
+from common.services.payment import MinappPayment
 from .models import OrderModel
 from .order_item import OrderItem
 from .order_logistics import OrderLogistics
@@ -57,29 +60,21 @@ class Order(object):
             return None
 
     @classmethod
-    def create(cls, user_id, receiver, item_list, total_amount, amount_payable, postage=0):
-        '''
-        创建订单
-
-        参数:
-        @param user_id 用户ID
-        @param item_list  
-        @param total_amount 
-        @param amount_payable 
-        @param postage 
-        '''
+    def create(cls, entry, user_id, receiver, item_list, total_amount, amount_payable, postage=0, pintuan_id=-1):
         total_amount = total_amount
         amount_payable = amount_payable
         postage = postage 
         
-        order_model = OrderModel.objects.create(
+        order_model_obj = OrderModel.objects.create(
+            entry=entry,
             order_sn='18' + str(sn()),
             user_id=user_id,
             total_amount=total_amount,
             amount_payable=amount_payable,
-            postage=postage
+            postage=postage,
+            pintuan_id=pintuan_id
         )
-        order_obj = cls(order_model.pk, model_obj=order_model)
+        order_obj = cls(order_model_obj.pk, model_obj=order_model_obj)
         
         for item in item_list:
             sku_id = item['sku_id']
@@ -94,6 +89,7 @@ class Order(object):
                 sku_info['price'],
                 number
             )
+        
         
         order_obj.set_receiver(
             receiver.get('name'),
@@ -145,6 +141,10 @@ class Order(object):
         if self.__receiver is None:
             self.__confirm_order_model()
             self.__receiver = OrderReceiver.get_order_receiver(self.__model_obj.order_sn)
+    
+    def __confirm_trade(self):
+        if self.__trade is None:
+            self.__trade = OrderTrade.get_order_receiver(self.__model_obj.order_sn)
 
     def __confirm_order_model(self):
         if self.__model_obj is None:
@@ -227,14 +227,41 @@ class Order(object):
         )
         return order_item_obj.id
 
-    def apply_trade(self):
+    def __apply_trade(self):
         self.__confirm_order_model()
-        order_trade = OrderTrade.create(
+        trade = OrderTrade.create(
             self.id,
             self.__model_obj.order_sn,
             self.__model_obj.amount_payable
         )
-        return order_trade
+        return trade
+    
+    def checkout(self, user_openid):
+        self.__confirm_order_model()
+        
+        order_trade = self.__apply_trade()
+
+        entry = self.__model_obj.entry
+        mina_payment = MinappPayment(
+            settings.ENTRY_CONFIG[entry]['WECHAT_APP_ID'],
+            settings.ENTRY_CONFIG[entry]['WECHAT_APP_SECRET'],
+            settings.ENTRY_CONFIG[entry]['WXPAY_MCH_ID'],
+            settings.ENTRY_CONFIG[entry]['WXPAY_API_KEY'],
+        )
+        
+        trade_basic_info = order_trade.get_basic_info()
+        prepay_id = mina_payment.get_prepay_id(
+            trade_basic_info['trade_no'],
+            trade_basic_info['trade_amount'],
+            self.__model_obj.order_sn,
+            user_openid,
+            'https://www.xiaobaidiandev.com/api/orders/{order_id}/pay/success'.format(
+                order_id=self.id
+            )
+        )
+        minapp_payment_params = mina_payment.get_js_api_parameter(prepay_id)
+        return minapp_payment_params 
+
 
     def get_logistics(self):
         self.__confirm_logistics()

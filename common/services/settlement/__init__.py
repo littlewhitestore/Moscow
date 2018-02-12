@@ -4,7 +4,7 @@ from django.conf import settings
 
 from common.services.goods import Goods 
 from common.services.order import Order
-from minapp_payment import MinappPayment
+from common.services.payment import MinappPayment
 
 class SettlementManager(object):
     
@@ -37,38 +37,18 @@ class SettlementManager(object):
         settlement_info = self.buynow_settlement(sku_id, number)
 
         order = Order.create(
+            entry=entry,
             user_id=self.__user_id,
             receiver=receiver,
             item_list=settlement_info['item_list'],
             total_amount=settlement_info['total_amount'],
             amount_payable=settlement_info['amount_payable']
         )
-        order_trade = order.apply_trade()
-
-        trade_basic_info = order_trade.get_basic_info()
-        order_basic_info = order.get_order_basic_info()
-        mina_payment = MinappPayment(
-            settings.ENTRY_CONFIG[entry]['WECHAT_APP_ID'],
-            settings.ENTRY_CONFIG[entry]['WECHAT_APP_SECRET'],
-            settings.ENTRY_CONFIG[entry]['WXPAY_MCH_ID'],
-            settings.ENTRY_CONFIG[entry]['WXPAY_API_KEY'],
-        )
-        trade_no = trade_basic_info.get('trade_no')
-        trade_amount = trade_basic_info.get('trade_amount')
-        prepay_id = mina_payment.get_prepay_id(
-            trade_no,
-            trade_amount,
-            order_basic_info['order_sn'],
-            self.__user_openid,
-            'https://www.xiaobaidiandev.com/api/orders/{order_id}/pay/success'.format(
-                order_id=order_basic_info['order_id']
-            )
-        )
-        mina_payment_params = mina_payment.get_js_api_parameter(prepay_id)
+        minapp_payment_params = order.checkout(self.__user_openid) 
 
         checkout_info = {
-            'order_id': order_basic_info.get('order_id'),
-            'mina_payment': mina_payment_params
+            'order_id': order.id, 
+            'mina_payment': minapp_payment_params
         }
 
         return checkout_info 
