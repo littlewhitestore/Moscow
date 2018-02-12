@@ -1,5 +1,4 @@
 # *-* coding:utf-8 *-*
-
 from __future__ import unicode_literals
 from django.conf import settings
 from django.http import HttpResponse
@@ -8,9 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import views
 import xmltodict
 
-from common.services.goods import Goods 
-from common.services.mina.payment import MinaPayment
-from common.services.order import Order
+from common.services.settlement import SettlementManager 
 from .decorators import check_token, login_required
 from .response import ApiJsonResponse, ApiResponseStatusCode
 
@@ -21,56 +18,24 @@ class BuyNowOrderView(views.APIView):
     @check_token
     @login_required
     def post(self, request):
-        sku_id = request.data.get('sku_id')
+        sku_id = int(request.data.get('sku_id'))
         number = int(request.data.get('number', '1'))
-        receiver = request.data.get('receiver', None)
+        receiver = request.data.get('receiver')
         
-        receiver = receiver
-        item_list = [{
-            'sku_id': int(sku_id),
-            'number': number 
-        }]
-        goods_obj = Goods.fetch_by_sku(sku_id)
-        sku_info = goods_obj.get_sku_info(sku_id)
-        total_amount = sku_info['price'] * number 
-        amount_payable = total_amount 
-
-        order = Order.create(
-            user_id=request.user_obj.id, 
-            receiver=receiver,
-            item_list=item_list,
-            total_amount=total_amount,
-            amount_payable=amount_payable
-        )
-        order_trade = order.apply_trade()
-
-        # 配置是否需要根据APPID更换
+        
         entry = request.entry
-        trade_basic_info = order_trade.get_basic_info()
-        order_basic_info = order.get_order_basic_info()
-        mina_payment = MinaPayment(
-            settings.ENTRY_CONFIG[entry]['WECHAT_APP_ID'],
-            settings.ENTRY_CONFIG[entry]['WECHAT_APP_SECRET'],
-            settings.ENTRY_CONFIG[entry]['WXPAY_MCH_ID'],
-            settings.ENTRY_CONFIG[entry]['WXPAY_API_KEY'],
-        )
-        trade_no = trade_basic_info.get('trade_no')
-        trade_amount = trade_basic_info.get('trade_amount')
-        prepay_id = mina_payment.get_prepay_id(
-            trade_no,
-            trade_amount,
-            order_basic_info.get('order_sn'),
-            request.user_obj.openid,
-            'https://www.xiaobaidiandev.com/api/orders/{order_id}/pay/success'.format( order_id=order_basic_info.get('order_id'))
-        )
-        mina_payment_params = mina_payment.get_js_api_parameter(prepay_id)
+        user_id = request.user_obj.id
+        user_openid = request.user_obj.openid
 
-        data = {
-            'order_id': order_basic_info.get('order_id'),
-            'mina_payment': mina_payment_params
-        }
+        mgr = SettlementManager(user_id, user_openid)
+        checkout_info = mgr.buynow_checkout(
+            entry=entry,
+            sku_id=sku_id,
+            number=number,
+            receiver=receiver
+        )
 
-        return ApiJsonResponse(data)
+        return ApiJsonResponse(checkout_info)
 
 class OrderListView(views.APIView):
     
@@ -188,24 +153,27 @@ class WeixinResponse(object):
     def __str__(self):
         return "<xml><return_code><![CDATA[%s]]></return_code><return_msg><![CDATA[%s]]></return_msg></xml>" % (self.__code, self.__msg)
 
-@csrf_exempt
-def weixin_pay_callback(request, order_id):
-    callback_data = xmltodict.parse(request.body).get('xml')
-    return_code = callback_data.get('return_code')
-    out_trade_no = callback_data.get('out_trade_no')
-    total_fee = callback_data.get('total_fee')
-    result_code = callback_data.get('result_code')
-    transaction_id = callback_data.get('transaction_id')
-    trade_type = callback_data.get('trade_type')
-    fee_type = callback_data.get('fee_type')
-    appid = callback_data.get("appid")
-    mch_id = callback_data.get("mch_id")
 
-    if return_code == "SUCCESS":
-        order = Order(order_id)
-        order.pay(out_trade_no)
-        return HttpResponse(WeixinResponse())
-    return HttpResponse(WeixinResponse(code="FAIL", msg="WEIXIN FAIL"))
+class WeixinPayCallbackView(views.APIView):
+    
+    @csrf_exempt
+    def post(self, request, order_id):
+        callback_data = xmltodict.parse(request.body).get('xml')
+        return_code = callback_data.get('return_code')
+        out_trade_no = callback_data.get('out_trade_no')
+        total_fee = callback_data.get('total_fee')
+        result_code = callback_data.get('result_code')
+        transaction_id = callback_data.get('transaction_id')
+        trade_type = callback_data.get('trade_type')
+        fee_type = callback_data.get('fee_type')
+        appid = callback_data.get("appid")
+        mch_id = callback_data.get("mch_id")
+    
+        if return_code == "SUCCESS":
+            order = Order(order_id)
+            order.pay(out_trade_no)
+            return HttpResponse(WeixinResponse())
+        return HttpResponse(WeixinResponse(code="FAIL", msg="WEIXIN FAIL"))
 
 @csrf_exempt
 def delivery(request, order_sn):

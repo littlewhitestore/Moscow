@@ -36,7 +36,7 @@ def dict_to_xml(data, tag='xml'):
         elem.append(child)
     return elem
 
-class MinaPayment(object):
+class MinappPayment(object):
     def __init__(self, appid, app_secret, mch_id, api_secret):
         self.appid = appid
         self.app_secret = app_secret
