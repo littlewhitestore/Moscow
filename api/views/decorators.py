@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from django.conf import settings
 
 from common.services.user import User
 from .response import ApiJsonResponse, ApiResponseStatusCode
@@ -19,8 +20,14 @@ def check_token(func):
         
         if entry == None:
             raise Exception('failed to get entry.')
+        entry = entry.lower()
         
-        request.user_obj = User.fetch_user_by_token(entry, token)  
+        if not settings.ENTRY_CONFIG.has_key(entry):
+            raise Exception('wrong entry [%s].'%entry)
+
+        
+        request.user_obj = User.fetch_user_by_token(entry, token)
+        request.entry = entry
         return func(self, request, *args, **kwargs)
     return wrapper
 

@@ -10,14 +10,17 @@ from .response import ApiJsonResponse
 import requests
 
 class Login(views.APIView):
-    
+   
+    @check_token
     def get(self, request):
         code = request.GET.get("code", None)
+        
+        entry = request.entry
         if code != None:
             url = 'https://api.weixin.qq.com/sns/jscode2session'
             payload = {
-                'appid': settings.WECHAT_APP_ID,
-                'secret': settings.WECHAT_APP_SECRET,
+                'appid': settings.ENTRY_CONFIG[entry]['WECHAT_APP_ID'],
+                'secret': settings.ENTRY_CONFIG[entry]['WECHAT_APP_SECRET'],
                 'js_code': code,
                 'grant_type': 'authorization_code'
             }
@@ -26,9 +29,9 @@ class Login(views.APIView):
             wx_openid = ret_data['openid']
             wx_session_key = ret_data['session_key']
             
-            user_obj = User.fetch_user_by_wx_openid(wx_openid)
+            user_obj = User.fetch_user_by_wx_openid(entry, wx_openid)
             if user_obj == None:
-                user_obj = User.create(wx_openid, wx_session_key)
+                user_obj = User.create(entry, wx_openid, wx_session_key)
             user_obj.update_token(additional_info=code, wx_session_key=wx_session_key)
             
         res = {

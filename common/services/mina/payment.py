@@ -38,12 +38,6 @@ def dict_to_xml(data, tag='xml'):
 
 class MinaPayment(object):
     def __init__(self, appid, app_secret, mch_id, api_secret):
-        '''
-        appid: wxd4eae843e18ff7da
-        app_secret: 510861ca183551e3a7fcbdc87573c00f
-        mch_id: 1495032292
-        api_key: aWNhdGUgQXV0aG9yXR5Q0wwYDVQQDEwR
-        '''
         self.appid = appid
         self.app_secret = app_secret
         self.mch_id = mch_id

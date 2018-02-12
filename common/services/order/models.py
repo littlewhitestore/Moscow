@@ -38,7 +38,7 @@ class OrderModel(models.Model):
 class OrderItemModel(models.Model):
     id = models.AutoField(primary_key=True)
     order_id = models.IntegerField(null=False, db_index=True)
-    order_sn = models.CharField(max_length=32)
+    order_sn = models.CharField(max_length=32, db_index=True)
     goods_id = models.IntegerField()
     goods_name = models.CharField(max_length=64, blank=True)
     sku_id = models.IntegerField()
@@ -72,10 +72,10 @@ class OrderReceiverModel(models.Model):
 class OrderTradeModel(models.Model):
     id = models.AutoField(primary_key=True)
     order_id = models.IntegerField(null=False, db_index=True)
-    order_sn = models.CharField(max_length=32)
-    trade_no = models.CharField(max_length=32)
+    order_sn = models.CharField(max_length=32, db_index=True)
+    trade_no = models.CharField(max_length=32, db_index=True)
     trade_amount = models.IntegerField(default=0)
-    trade_status = models.IntegerField(default=0)
+    trade_status = models.IntegerField(default=0, db_index=True)
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
 
@@ -85,7 +85,7 @@ class OrderTradeModel(models.Model):
 class OrderLogisticsModel(models.Model):
     id = models.AutoField(primary_key=True)
     order_id = models.IntegerField(null=False, db_index=True)
-    order_sn = models.CharField(max_length=32, unique=True)
+    order_sn = models.CharField(max_length=32, unique=True, db_index=True)
     com = models.CharField(max_length=32)
     nu = models.CharField(max_length=32)
     data = models.TextField()

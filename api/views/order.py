@@ -45,13 +45,14 @@ class BuyNowOrderView(views.APIView):
         order_trade = order.apply_trade()
 
         # 配置是否需要根据APPID更换
+        entry = request.entry
         trade_basic_info = order_trade.get_basic_info()
         order_basic_info = order.get_order_basic_info()
         mina_payment = MinaPayment(
-            settings.WECHAT_APP_ID,
-            settings.WECHAT_APP_SECRET,
-            settings.WXPAY_MCH_ID,
-            settings.WXPAY_API_KEY,
+            settings.ENTRY_CONFIG[entry]['WECHAT_APP_ID'],
+            settings.ENTRY_CONFIG[entry]['WECHAT_APP_SECRET'],
+            settings.ENTRY_CONFIG[entry]['WXPAY_MCH_ID'],
+            settings.ENTRY_CONFIG[entry]['WXPAY_API_KEY'],
         )
         trade_no = trade_basic_info.get('trade_no')
         trade_amount = trade_basic_info.get('trade_amount')
@@ -60,7 +61,7 @@ class BuyNowOrderView(views.APIView):
             trade_amount,
             order_basic_info.get('order_sn'),
             request.user_obj.openid,
-            'https://www.xiaobaidiandev.com/api/orders/{order_id}/payment'.format( order_id=order_basic_info.get('order_id'))
+            'https://www.xiaobaidiandev.com/api/orders/{order_id}/pay/success'.format( order_id=order_basic_info.get('order_id'))
         )
         mina_payment_params = mina_payment.get_js_api_parameter(prepay_id)
 
@@ -72,6 +73,8 @@ class BuyNowOrderView(views.APIView):
         return ApiJsonResponse(data)
 
 class OrderListView(views.APIView):
+    
+    
     def __order_data(self, order):
         order_basic_info = order.get_order_basic_info()
         basic_data = {
@@ -79,18 +82,21 @@ class OrderListView(views.APIView):
             'status_desc': order.get_status_text(),
             'order_sn': order_basic_info.get('order_sn'),      # 订单号
             'postage': order_basic_info.get('postage'),        # 邮费
-            'amount_payable': order_basic_info.get('amount_payable'), # 订单金额
+            'amount_payable': float(order_basic_info.get('amount_payable')) / 100.0, # 订单金额
         }
         order_items = order.get_order_item_list()
         items = []
         for order_item in order_items:
             item_basic = order_item.get_basic_info()
+            sku_id = item_basic['sku_id']
+            goods_obj = Goods.fetch_by_sku(sku_id)
+            sku_info = goods_obj.get_sku_info(sku_id)
             items.append({
-                'thumbnail': '#TODO获取sku的缩略图',
-                'sku_name': item_basic.get('sku_name'),
-                'number': item_basic.get('number'),
-                'attrs': ['颜色:卡其色', '尺寸: XL'],
-                'sale_price': item_basic.get('sale_price')
+                'thumbnail': sku_info['image_url'], 
+                'sku_name': item_basic['goods_name'],
+                'number': item_basic['number'],
+                'attrs': item_basic['sku_property'], 
+                'sale_price': float(item_basic['sale_price']) / 100.0
             })
         basic_data['items'] = items
         return basic_data
@@ -116,18 +122,21 @@ class OrderDetailView(views.APIView):
             'status_desc': order.get_status_text(),
             'order_sn': order_basic_info.get('order_sn'),      # 订单号
             'postage': order_basic_info.get('postage'),        # 邮费
-            'amount_payable': order_basic_info.get('amount_payable'), # 订单金额
+            'amount_payable': float(order_basic_info.get('amount_payable')) / 100.0, # 订单金额
         }
         order_items = order.get_order_item_list()
         items = []
         for order_item in order_items:
             item_basic = order_item.get_basic_info()
+            sku_id = item_basic['sku_id']
+            goods_obj = Goods.fetch_by_sku(sku_id)
+            sku_info = goods_obj.get_sku_info(sku_id)
             items.append({
-                'thumbnail': '#TODO获取sku的缩略图',
-                'sku_name': item_basic.get('sku_name'),
-                'number': item_basic.get('number'),
-                'attrs': ['颜色:卡其色', '尺寸: XL'],
-                'sale_price': item_basic.get('sale_price')
+                'thumbnail': sku_info['image_url'], 
+                'sku_name': item_basic['goods_name'],
+                'number': item_basic['number'],
+                'attrs': item_basic['sku_property'], 
+                'sale_price': float(item_basic['sale_price']) / 100.0
             })
         basic_data['items'] = items
         receiver = order.get_receiver()
@@ -180,17 +189,17 @@ class WeixinResponse(object):
         return "<xml><return_code><![CDATA[%s]]></return_code><return_msg><![CDATA[%s]]></return_msg></xml>" % (self.__code, self.__msg)
 
 @csrf_exempt
-def weixin_pay_cb(request, order_id):
-    cb_data = xmltodict.parse(request.body).get('xml')
-    return_code = cb_data.get('return_code')
-    out_trade_no = cb_data.get('out_trade_no')
-    total_fee = cb_data.get('total_fee')
-    result_code = cb_data.get('result_code')
-    transaction_id = cb_data.get('transaction_id')
-    trade_type = cb_data.get('trade_type')
-    fee_type = cb_data.get('fee_type')
-    appid = cb_data.get("appid")
-    mch_id = cb_data.get("mch_id")
+def weixin_pay_callback(request, order_id):
+    callback_data = xmltodict.parse(request.body).get('xml')
+    return_code = callback_data.get('return_code')
+    out_trade_no = callback_data.get('out_trade_no')
+    total_fee = callback_data.get('total_fee')
+    result_code = callback_data.get('result_code')
+    transaction_id = callback_data.get('transaction_id')
+    trade_type = callback_data.get('trade_type')
+    fee_type = callback_data.get('fee_type')
+    appid = callback_data.get("appid")
+    mch_id = callback_data.get("mch_id")
 
     if return_code == "SUCCESS":
         order = Order(order_id)
