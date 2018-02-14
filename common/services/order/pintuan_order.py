@@ -2,6 +2,7 @@
 from common.services.goods import Goods
 from .models import PintuanOrderModel
 from .order import Order
+import datetime
 
 class PintuanOrderStatus(object):
     CREATED = 1
@@ -37,20 +38,31 @@ class PintuanOrder(object):
 
 
     @classmethod
-    def create(cls, sku_id, price, user_id, receiver):
-        item_list = [{
-            'sku_id': sku_id, 
-            'number': number
-        }]
-        total_amount = price
-        amount_payable = price
-        order_obj = Order.create(user_id, receiver, item_list, total_amount, amount_payable)
-
-        pintuan_order_model = PintuanOrderModel.objects.create(
+    def create(cls, entry, user_id, receiver, sku_id, price, order_total_amount, order_amount_payable): 
+        
+        finish_time = datetime.datetime.now() + datetime.timedelta(hours=24)
+        pintuan_order_model_obj = PintuanOrderModel.objects.create(
             sku_id=sku_id,
             price=price,
-            start_order_id=order_obj.id,
-            pintuan_order_status=PintuanOrderStatus.CREATED
+            start_user_id=user_id,
+            pintuan_order_status=PintuanOrderStatus.CREATED,
+            finish_time=finish_time
+        )
+        
+        item_list = {['sku_id': sku_id, 'number': 1]} 
+        order_obj = Order.create(
+            entry=entry, 
+            user_id=user_id,
+            receiver=receiver,
+            item_lis=item_list, 
+            total_amount=order_total_amount,
+            amount_payable=order_amount_payable,
+            pintuan_id=pintuan_order_model_obj.id
         )
 
+        result = {
+            'pintuan_order_obj': cls(pintuan_order_model.id, pintuan_order_model), 
+            'start_order_obj': order_obj
+        }
+        return result
 

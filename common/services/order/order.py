@@ -60,7 +60,7 @@ class Order(object):
             return None
 
     @classmethod
-    def create(cls, entry, user_id, receiver, item_list, total_amount, amount_payable, postage=0, pintuan_id=-1):
+    def create(cls, entry, user_id, receiver, item_list, total_amount, amount_payable, pintuan_id=-1):
         total_amount = total_amount
         amount_payable = amount_payable
         postage = postage 
@@ -71,7 +71,7 @@ class Order(object):
             user_id=user_id,
             total_amount=total_amount,
             amount_payable=amount_payable,
-            postage=postage,
+            postage=0,
             pintuan_id=pintuan_id
         )
         order_obj = cls(order_model_obj.pk, model_obj=order_model_obj)
