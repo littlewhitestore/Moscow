@@ -63,7 +63,6 @@ class Order(object):
     def create(cls, entry, user_id, receiver, item_list, total_amount, amount_payable, pintuan_id=-1):
         total_amount = total_amount
         amount_payable = amount_payable
-        postage = postage 
         
         order_model_obj = OrderModel.objects.create(
             entry=entry,

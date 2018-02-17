@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 
 from common.services.goods import Goods 
-from common.services.order import Order
-from common.services.pintuan_order import PintuanOrder
+from common.services.order import Order, Pintuan
 from common.services.payment import MinappPayment
 
 class SettlementManager(object):
@@ -84,10 +83,12 @@ class SettlementManager(object):
             order_total_amount=settlement_info['total_amount'],
             order_amount_payable=settlement_info['amount_payable']
         )
-        minapp_payment_params = order.checkout(self.__user_openid) 
+        pintuan_obj = result['pintuan_obj']
+        start_order_obj = result['start_order_obj']
+        minapp_payment_params = start_order_obj.checkout(self.__user_openid) 
 
         checkout_info = {
-            'order_id': order.id, 
+            'order_id': start_order_obj.id, 
             'mina_payment': minapp_payment_params
         }
 
