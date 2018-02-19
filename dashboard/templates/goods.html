@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+            
+{% block main %}
+<h2>商品列表</h2>
+<table class="table table-striped table-sm">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>名称</th>
+      <th>售价</th>
+      <th>Header</th>
+      <th>Header</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for goods in goods_list %}
+    <tr>
+      <td>{{goods.id}}</td>
+      <td>{{goods.name}}</td>
+      <td>{{goods.price}}</td>
+      <td>dolor</td>
+      <td>sit</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

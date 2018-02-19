@@ -77,7 +77,23 @@ class Goods(object):
             obj.update_detail_image_list(detail_image_list)
 
         return obj
-    
+   
+    @classmethod
+    def _filter(cls, fargs={}, qexp=None):
+        hdl = GoodsModel.objects.all()
+        if fargs != None and len(fargs) > 0:
+            hdl = hdl.filter(**fargs)
+        if qexp != None:
+            hdl = hdl.filter(qexp)
+        return hdl 
+        
+    @classmethod
+    def fetch(cls, fargs={}, qexp=None, offset=0, count=20):
+        hdl = cls._filter(fargs, qexp)
+        hdl = hdl[offset : offset + count]
+        obj_list = map(lambda _m: cls(_m.pk, _m), hdl)
+        return obj_list
+
     
     @classmethod
     def fetch_recommend_goods(cls, offset=0, count=20):
