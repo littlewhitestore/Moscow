@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load utils %}
             
 {% block main %}
 <h2>商品列表</h2>
@@ -17,7 +18,7 @@
     <tr>
       <td>{{goods.id}}</td>
       <td>{{goods.name}}</td>
-      <td>{{goods.price}}</td>
+      <td>{{goods.price|format_price}}</td>
       <td>dolor</td>
       <td>sit</td>
     </tr>
