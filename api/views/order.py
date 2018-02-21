@@ -13,29 +13,6 @@ from .response import ApiJsonResponse, ApiResponseStatusCode
 
 import json
 
-class BuyNowOrderView(views.APIView):
-
-    @check_token
-    @login_required
-    def post(self, request):
-        sku_id = int(request.data.get('sku_id'))
-        number = int(request.data.get('number', '1'))
-        receiver = request.data.get('receiver')
-        
-        
-        entry = request.entry
-        user_id = request.user_obj.id
-        user_openid = request.user_obj.openid
-
-        mgr = SettlementManager(user_id, user_openid)
-        checkout_info = mgr.buynow_checkout(
-            entry=entry,
-            sku_id=sku_id,
-            number=number,
-            receiver=receiver
-        )
-
-        return ApiJsonResponse(checkout_info)
 
 class OrderListView(views.APIView):
     

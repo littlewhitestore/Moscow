@@ -4,7 +4,6 @@ from django.conf import settings
 
 from common.services.goods import Goods 
 from common.services.order import Order, Pintuan
-from common.services.payment import MinappPayment
 
 class SettlementManager(object):
     
@@ -52,7 +51,7 @@ class SettlementManager(object):
 
         return checkout_info 
 
-    def pintuan_settlement(self, sku_id):
+    def pintuan_create_settlement(self, sku_id):
         goods_obj = Goods.fetch_by_sku(sku_id)
         sku_info = goods_obj.get_sku_info(sku_id)
         item = {
@@ -64,6 +63,7 @@ class SettlementManager(object):
             "attrs": sku_info['property'].split(';') 
         }
         settlement_info = {
+            'price': sku_info['price'],
             'total_amount': sku_info['price'],
             'amount_payable': sku_info['price'], 
             'item_list': [item]
@@ -71,10 +71,10 @@ class SettlementManager(object):
         return settlement_info 
 
     
-    def pintuan_checkout(self, entry, sku_id, number, receiver):
-        settlement_info = self.pintuan_settlement(sku_id)
+    def pintuan_create_checkout(self, entry, sku_id, receiver):
+        settlement_info = self.pintuan_create_settlement(sku_id)
         
-        result = PintuanOrder.create(
+        result = Pintuan.create(
             entry=entry,
             user_id=self.__user_id,
             receiver=receiver,

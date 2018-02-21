@@ -25,7 +25,7 @@ class Pintuan(object):
 
     def __confirm_pintuan_model(self):
         if self.__model_obj == None:
-            self.__model_obj = PintuanOrderModel.objects.get(pk=self.__pintuan_id)
+            self.__model_obj = PintuanModel.objects.get(pk=self.__pintuan_id)
 
     @property
     def id(self):
@@ -41,11 +41,11 @@ class Pintuan(object):
     def create(cls, entry, user_id, receiver, sku_id, price, order_total_amount, order_amount_payable): 
         
         finish_time = datetime.datetime.now() + datetime.timedelta(hours=24)
-        pintuan_model_obj = PintuanOrderModel.objects.create(
+        pintuan_model_obj = PintuanModel.objects.create(
             sku_id=sku_id,
             price=price,
             start_user_id=user_id,
-            pintuan_status=PintuanOrderStatus.CREATED,
+            pintuan_status=PintuanStatus.CREATED,
             finish_time=finish_time
         )
         
@@ -54,14 +54,14 @@ class Pintuan(object):
             entry=entry, 
             user_id=user_id,
             receiver=receiver,
-            item_lis=item_list, 
+            item_list=item_list, 
             total_amount=order_total_amount,
             amount_payable=order_amount_payable,
             pintuan_id=pintuan_model_obj.id
         )
 
         result = {
-            'pintuan_obj': cls(pintuan_model.id, pintuan_model), 
+            'pintuan_obj': cls(pintuan_model_obj.id, pintuan_model_obj), 
             'start_order_obj': order_obj
         }
         return result
