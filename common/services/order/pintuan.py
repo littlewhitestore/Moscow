@@ -39,8 +39,7 @@ class Pintuan(object):
 
     @classmethod
     def create(cls, entry, user_id, receiver, sku_id, price, order_total_amount, order_amount_payable): 
-        
-        finish_time = datetime.datetime.now() + datetime.timedelta(hours=24)
+        finish_time = datetime.datetime.now() + datetime.timedelta(hours=72)
         pintuan_model_obj = PintuanModel.objects.create(
             sku_id=sku_id,
             price=price,
@@ -65,4 +64,38 @@ class Pintuan(object):
             'start_order_obj': order_obj
         }
         return result
+    
+    @property
+    def success_order_number(self):
+        return 0
 
+    
+    @property
+    def is_not_finished(self):
+        self.__confirm_pintuan_model()
+        if self.success_order_number > self.__model_obj.success_target:
+            return False
+        if datetime.datetime.now() > self.__model_obj.finish_time:
+            return False 
+        return True 
+    
+    @property
+    def pintuan_price(self):
+        self.__confirm_pintuan_model()
+        return self.__model_obj.price
+    
+    def join(self, user_id, receiver, order_total_amount, order_amount_payable):
+        self.__confirm_pintuan_model()
+        item_list = [{'sku_id': self.__model_obj.sku_id, 'number': 1}] 
+         
+        order_obj = Order.create(
+            entry=entry, 
+            user_id=user_id,
+            receiver=receiver,
+            item_list=item_list, 
+            total_amount=order_total_amount,
+            amount_payable=order_amount_payable,
+            pintuan_id=self.__model_obj.id
+        )
+
+        return order_obj 

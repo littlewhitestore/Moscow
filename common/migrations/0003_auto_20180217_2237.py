@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('sku_id', models.IntegerField()),
                 ('price', models.IntegerField(db_index=True)),
-                ('success_order_number', models.IntegerField()),
+                ('success_target', models.IntegerField()),
                 ('start_user_id', models.IntegerField(db_index=True)),
                 ('pintuan_status', models.IntegerField(db_index=True, default=0)),
                 ('finish_time', models.DateTimeField(db_index=True)),
