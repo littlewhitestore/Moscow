@@ -6,6 +6,29 @@ import hashlib
 
 from .models import GoodsModel, GoodsBannerImageModel, GoodsDetailImageModel, GoodsSkuModel
 
+class GoodsStatus(object):
+    FREEZED = 0
+    NORMAL = 1
+
+    @classmethod
+    def dict(cls):
+        return {
+            cls.FREEZED: "冻结",
+            cls.NORMAL: "正常",
+        }
+
+class SkuStatus(object):
+    FREEZED = 0
+    NORMAL = 1
+
+    @classmethod
+    def dict(cls):
+        return {
+            cls.FREEZED: "下架",
+            cls.NORMAL: "上架",
+        }
+
+
 class Goods(object):
 
     def __init__(self, id, goods_model_obj=None):
@@ -34,7 +57,7 @@ class Goods(object):
     def __confirm_goods_sku_model_dict(self):
         if self.__goods_sku_model_dict == None:
             self.__goods_sku_model_dict = {}
-            for obj in GoodsSkuModel.objects.filter(goods_id=self.id, status=1).order_by('created_time'):
+            for obj in GoodsSkuModel.objects.filter(goods_id=self.id, status=SkuStatus.NORMAL).order_by('created_time'):
                 self.__goods_sku_model_dict[obj.id] = obj
 
     def __is_property_vector_conflict(self, pv_a, pv_b):
@@ -57,7 +80,7 @@ class Goods(object):
         return self.__id
 
     @classmethod
-    def create(cls, name, price, market_price, taobao_id='', status=1,
+    def create(cls, name, price, market_price, taobao_id='', status=GoodsStatus.NORMAL,
         banner_image_list=None, detail_image_list=None):
 
         goods_model_obj = GoodsModel(
@@ -98,7 +121,7 @@ class Goods(object):
     @classmethod
     def fetch_recommend_goods(cls, offset=0, count=20):
         goods_obj_list = []
-        for goods_model_obj in GoodsModel.objects.filter(status=1).order_by('-created_time')[offset : offset + count]:
+        for goods_model_obj in GoodsModel.objects.filter(status=GoodsStatus.NORMAL).order_by('-created_time')[offset : offset + count]:
             goods_obj_list.append(cls(goods_model_obj.id, goods_model_obj))
         return goods_obj_list
 
@@ -111,7 +134,7 @@ class Goods(object):
         return cls(goods_id)
             
 
-    def add_sku(self, image_url, property_vector, price, stock=0, status=1):
+    def add_sku(self, image_url, property_vector, price, stock=0, status=SkuStatus.NORMAL):
         self.__confirm_goods_sku_model_dict()
         for obj in self.__goods_sku_model_dict.values():
             if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
@@ -140,6 +163,7 @@ class Goods(object):
             'price': self.__goods_model_obj.price,
             'market_price': self.__goods_model_obj.market_price,
             'status': self.__goods_model_obj.status,
+            'status_text': GoodsStatus.dict()[self.__goods_model_obj.status],
             'banner_image_list': self.__goods_banner_image_list,
             'detail_image_list': self.__goods_detail_image_list,
         }

@@ -9,11 +9,34 @@ class GoodsListView(View):
     
     def get(self, request):
         goods_obj_list = Goods.fetch()
-        goods_data_list = map(lambda _obj: _obj.read(), goods_obj_list)
+        goods_data_list = []
+        for obj in goods_obj_list:
+            data = obj.read()
+            sku_list = obj.fetch_sku_all()
+            data['sku_number'] = len(sku_list)
+            goods_data_list.append(data)
         
         context = {
             'goods_list': goods_data_list
         }
-        response = TemplateResponse(request, 'goods.html', context)
+        response = TemplateResponse(request, 'goods/list.html', context)
 
         return response 
+
+class GoodsEditView(View):
+    
+    def get(self, request, goods_id):
+        goods_obj = Goods(goods_id)
+        detail_info = goods_obj.read()
+        sku_list = goods_obj.fetch_sku_all()
+        
+        context = {
+            'detail_info': detail_info,
+            'sku_list': sku_list
+        }
+        response = TemplateResponse(request, 'goods/edit.html', context)
+
+        return response 
+    
+    def post(self, request, goods_id):
+        pass
