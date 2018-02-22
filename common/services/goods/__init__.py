@@ -83,13 +83,14 @@ class Goods(object):
 
     @classmethod
     def create(cls, name, price, market_price, taobao_id='', status=GoodsStatus.NORMAL,
-        banner_image_list=None, detail_image_list=None):
+        supply_source='', supply_item_id='', banner_image_list=None, detail_image_list=None):
 
         goods_model_obj = GoodsModel(
             name=name,
             price=price,
             market_price=market_price,
-            taobao_id=taobao_id,
+            supply_source=supply_source,
+            supply_item_id=supply_item_id,
             status=status
         )
         goods_model_obj.save()

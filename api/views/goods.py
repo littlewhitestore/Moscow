@@ -65,7 +65,8 @@ class GoodsUpload(views.APIView):
         banner_images = request.data.get('banner_images')
         detail_images = request.data.get('detail_images')
         name = request.data.get('name')
-        taobao_id = request.data.get('taobao_id')
+        supply_source = request.data.get('supply_source')
+        supply_item_id = request.data.get('supply_item_id')
         price = request.data.get('price')
         market_price = request.data.get('market_price')
         
@@ -74,7 +75,8 @@ class GoodsUpload(views.APIView):
         
         goods_obj = Goods.create(
             name=name,
-            taobao_id=taobao_id,
+            supply_source=supply_source,
+            supply_item_id=supply_item_id,
             price=price,
             market_price=market_price,
             status=1,

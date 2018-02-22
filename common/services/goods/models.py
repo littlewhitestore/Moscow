@@ -6,10 +6,11 @@ from django.db import models
 class GoodsModel(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=256, default='')
-    taobao_id = models.CharField(max_length=128, default='', db_index=True)
     market_price = models.IntegerField(null=False, db_index=True)
     price = models.IntegerField(null=False, db_index=True)
     status = models.IntegerField(null=False, db_index=True)
+    supply_source = models.CharField(max_length=128, default='', db_index=True)
+    supply_item_id = models.CharField(max_length=128, default='', db_index=True)
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
     
