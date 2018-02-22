@@ -16,6 +16,19 @@ class GoodsStatus(object):
             cls.FREEZED: "冻结",
             cls.NORMAL: "正常",
         }
+    
+    @classmethod
+    def list(cls):
+        return [
+            {
+                "key": cls.FREEZED,
+                "value": "冻结"
+            },
+            {
+                "key": cls.NORMAL, 
+                "value": "正常",
+            }
+        ]
 
 class SkuStatus(object):
     FREEZED = 0
@@ -51,7 +64,7 @@ class Goods(object):
     def __confirm_goods_detail_image_model(self):
         if self.__goods_detail_image_list == None:
             self.__goods_detail_image_list = []
-            for obj in GoodsBannerImageModel.objects.filter(goods_id=self.id).order_by('sort'):
+            for obj in GoodsDetailImageModel.objects.filter(goods_id=self.id).order_by('sort'):
                 self.__goods_detail_image_list.append(obj.url)
     
     def __confirm_goods_sku_model_dict(self):

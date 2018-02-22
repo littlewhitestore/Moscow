@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.template.response import TemplateResponse 
 from django.views import View
 
-from common.services.goods import Goods
+from common.services.goods import Goods, GoodsStatus
 
 class GoodsListView(View):
     
@@ -27,12 +27,13 @@ class GoodsEditView(View):
     
     def get(self, request, goods_id):
         goods_obj = Goods(goods_id)
-        detail_info = goods_obj.read()
+        goods_info = goods_obj.read()
         sku_list = goods_obj.fetch_sku_all()
         
         context = {
-            'detail_info': detail_info,
-            'sku_list': sku_list
+            'goods_info': goods_info,
+            'sku_list': sku_list,
+            'goods_status_list': GoodsStatus.list(),
         }
         response = TemplateResponse(request, 'goods/edit.html', context)
 
