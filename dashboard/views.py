@@ -33,7 +33,7 @@ class GoodsEditView(View):
         context = {
             'goods_info': goods_info,
             'sku_list': sku_list,
-            'goods_status_list': GoodsStatus.list(),
+            'goods_status_list': GoodsStatus.all(),
         }
         response = TemplateResponse(request, 'goods/edit.html', context)
 

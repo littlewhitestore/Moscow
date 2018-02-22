@@ -22,7 +22,9 @@
       <td>{{goods.price|format_price}}</td>
       <td>{{goods.sku_number}}</td>
       <td>{{goods.status_text}}</td>
-      <td><a href="{% url "dashboard.goods.edit" goods.id %}">编辑</a></td>
+      <td>
+        <a href="{% url "dashboard.goods.edit" goods.id %}">编辑</a>
+      </td>
     </tr>
     {% endfor %}
   </tbody>

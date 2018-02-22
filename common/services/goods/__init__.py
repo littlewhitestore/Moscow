@@ -5,8 +5,9 @@ import json
 import hashlib
 
 from .models import GoodsModel, GoodsBannerImageModel, GoodsDetailImageModel, GoodsSkuModel
+from common.services.base import StatusBase
 
-class GoodsStatus(object):
+class GoodsStatus(StatusBase):
     FREEZED = 0
     NORMAL = 1
 
@@ -17,20 +18,8 @@ class GoodsStatus(object):
             cls.NORMAL: "正常",
         }
     
-    @classmethod
-    def list(cls):
-        return [
-            {
-                "key": cls.FREEZED,
-                "value": "冻结"
-            },
-            {
-                "key": cls.NORMAL, 
-                "value": "正常",
-            }
-        ]
 
-class SkuStatus(object):
+class SkuStatus(StatusBase):
     FREEZED = 0
     NORMAL = 1
 
@@ -40,7 +29,7 @@ class SkuStatus(object):
             cls.FREEZED: "下架",
             cls.NORMAL: "上架",
         }
-
+    
 
 class Goods(object):
 
