@@ -5,6 +5,31 @@ import json
 import hashlib
 
 from .models import GoodsModel, GoodsBannerImageModel, GoodsDetailImageModel, GoodsSkuModel
+from common.services.base import StatusBase
+
+class GoodsStatus(StatusBase):
+    FREEZED = 0
+    NORMAL = 1
+
+    @classmethod
+    def dict(cls):
+        return {
+            cls.FREEZED: "冻结",
+            cls.NORMAL: "正常",
+        }
+    
+
+class SkuStatus(StatusBase):
+    FREEZED = 0
+    NORMAL = 1
+
+    @classmethod
+    def dict(cls):
+        return {
+            cls.FREEZED: "下架",
+            cls.NORMAL: "上架",
+        }
+    
 
 class Goods(object):
 
@@ -28,13 +53,13 @@ class Goods(object):
     def __confirm_goods_detail_image_model(self):
         if self.__goods_detail_image_list == None:
             self.__goods_detail_image_list = []
-            for obj in GoodsBannerImageModel.objects.filter(goods_id=self.id).order_by('sort'):
+            for obj in GoodsDetailImageModel.objects.filter(goods_id=self.id).order_by('sort'):
                 self.__goods_detail_image_list.append(obj.url)
     
     def __confirm_goods_sku_model_dict(self):
         if self.__goods_sku_model_dict == None:
             self.__goods_sku_model_dict = {}
-            for obj in GoodsSkuModel.objects.filter(goods_id=self.id, status=1).order_by('created_time'):
+            for obj in GoodsSkuModel.objects.filter(goods_id=self.id, status=SkuStatus.NORMAL).order_by('created_time'):
                 self.__goods_sku_model_dict[obj.id] = obj
 
     def __is_property_vector_conflict(self, pv_a, pv_b):
@@ -57,7 +82,7 @@ class Goods(object):
         return self.__id
 
     @classmethod
-    def create(cls, name, price, market_price, taobao_id='', status=1,
+    def create(cls, name, price, market_price, taobao_id='', status=GoodsStatus.NORMAL,
         banner_image_list=None, detail_image_list=None):
 
         goods_model_obj = GoodsModel(
@@ -77,12 +102,28 @@ class Goods(object):
             obj.update_detail_image_list(detail_image_list)
 
         return obj
-    
+   
+    @classmethod
+    def _filter(cls, fargs={}, qexp=None):
+        hdl = GoodsModel.objects.all()
+        if fargs != None and len(fargs) > 0:
+            hdl = hdl.filter(**fargs)
+        if qexp != None:
+            hdl = hdl.filter(qexp)
+        return hdl 
+        
+    @classmethod
+    def fetch(cls, fargs={}, qexp=None, offset=0, count=20):
+        hdl = cls._filter(fargs, qexp)
+        hdl = hdl[offset : offset + count]
+        obj_list = map(lambda _m: cls(_m.pk, _m), hdl)
+        return obj_list
+
     
     @classmethod
     def fetch_recommend_goods(cls, offset=0, count=20):
         goods_obj_list = []
-        for goods_model_obj in GoodsModel.objects.filter(status=1).order_by('-created_time')[offset : offset + count]:
+        for goods_model_obj in GoodsModel.objects.filter(status=GoodsStatus.NORMAL).order_by('-created_time')[offset : offset + count]:
             goods_obj_list.append(cls(goods_model_obj.id, goods_model_obj))
         return goods_obj_list
 
@@ -95,7 +136,7 @@ class Goods(object):
         return cls(goods_id)
             
 
-    def add_sku(self, image_url, property_vector, price, stock=0, status=1):
+    def add_sku(self, image_url, property_vector, price, stock=0, status=SkuStatus.NORMAL):
         self.__confirm_goods_sku_model_dict()
         for obj in self.__goods_sku_model_dict.values():
             if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
@@ -124,6 +165,7 @@ class Goods(object):
             'price': self.__goods_model_obj.price,
             'market_price': self.__goods_model_obj.market_price,
             'status': self.__goods_model_obj.status,
+            'status_text': GoodsStatus.dict()[self.__goods_model_obj.status],
             'banner_image_list': self.__goods_banner_image_list,
             'detail_image_list': self.__goods_detail_image_list,
         }
