@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load utils %}
+            
+{% block main %}
+<h2>商品列表</h2>
+<table class="table table-striped table-sm">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>名称</th>
+      <th>售价</th>
+      <th>SKU</th>
+      <th>状态</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for goods in goods_list %}
+    <tr>
+      <td>{{goods.id}}</td>
+      <td>{{goods.name}}</td>
+      <td>{{goods.price|format_price}}</td>
+      <td>{{goods.sku_number}}</td>
+      <td>{{goods.status_text}}</td>
+      <td>
+        <a href="{% url "dashboard.goods.edit" goods.id %}">编辑</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
