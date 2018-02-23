@@ -2,6 +2,7 @@
 from common.services.goods import Goods
 from .models import PintuanModel
 from .order import Order
+from .snowflake import sn
 import datetime
 
 class PintuanStatus(object):
@@ -38,9 +39,10 @@ class Pintuan(object):
 
 
     @classmethod
-    def create(cls, entry, user_id, receiver, sku_id, price, order_total_amount, order_amount_payable): 
+    def create(cls, entry, user_id, receiver, sku_id, number, price, order_total_amount, order_amount_payable): 
         finish_time = datetime.datetime.now() + datetime.timedelta(hours=72)
         pintuan_model_obj = PintuanModel.objects.create(
+            pintuan_sn='19' + str(sn()),
             sku_id=sku_id,
             price=price,
             start_user_id=user_id,
@@ -48,7 +50,7 @@ class Pintuan(object):
             finish_time=finish_time
         )
         
-        item_list = [{'sku_id': sku_id, 'number': 1}] 
+        item_list = [{'sku_id': sku_id, 'number': number}] 
         order_obj = Order.create(
             entry=entry, 
             user_id=user_id,

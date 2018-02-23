@@ -30,7 +30,7 @@ class SettlementBuyNowView(views.APIView):
         
         return ApiJsonResponse(data)
 
-class BuyNowOrderView(views.APIView):
+class OrderCreateBuyNowView(views.APIView):
 
     @check_token
     @login_required
@@ -54,19 +54,20 @@ class BuyNowOrderView(views.APIView):
 
         return ApiJsonResponse(checkout_info)
 
-class SettlementPintuanCreateView(views.APIView):
+class SettlementPintuanView(views.APIView):
 
     @check_token
     @login_required
     def post(self, request):
-        print "testing pintuan!!!"
         sku_id = int(request.data.get('sku_id'))
+        number = int(request.data.get('number'))
         receiver = request.data.get('receiver', None)
+        pintuan_id = request.data.get('pintuan_id', None)
 
         user_id = request.user_obj.id
         user_openid = request.user_obj.openid
         mgr = SettlementManager(user_id, user_openid)
-        settlement_info = mgr.pintuan_create_settlement(sku_id)
+        settlement_info = mgr.pintuan_create_settlement(sku_id, number)
         
         data = {
             'items': settlement_info['item_list'],
@@ -78,13 +79,13 @@ class SettlementPintuanCreateView(views.APIView):
         
         return ApiJsonResponse(data)
 
-class OrderPintuanCreateCheckoutView(views.APIView):
+class OrderCreatePintuanView(views.APIView):
 
     @check_token
     @login_required
     def post(self, request):
-        print "test pintuan create checkout !!!"
         sku_id = int(request.data.get('sku_id'))
+        number = int(request.data.get('number'))
         receiver = request.data.get('receiver')
         
         
@@ -96,6 +97,7 @@ class OrderPintuanCreateCheckoutView(views.APIView):
         checkout_info = mgr.pintuan_create_checkout(
             entry=entry,
             sku_id=sku_id,
+            number=number,
             receiver=receiver
         )
 
