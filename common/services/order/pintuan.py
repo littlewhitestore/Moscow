@@ -49,24 +49,46 @@ class Pintuan(object):
             pintuan_status=PintuanStatus.CREATED,
             finish_time=finish_time
         )
-        
-        item_list = [{'sku_id': sku_id, 'number': number}] 
-        order_obj = Order.create(
-            entry=entry, 
+
+        pintuan_obj = cls(pintuan_model_obj.id, pintuan_model_obj)
+        order_obj = pintuan_obj.join(
+            entry=entry,
             user_id=user_id,
             receiver=receiver,
-            item_list=item_list, 
-            total_amount=order_total_amount,
-            amount_payable=order_amount_payable,
-            pintuan_id=pintuan_model_obj.id
+            number=number,
+            order_total_amount=order_total_amount,
+            order_amount_payable=order_amount_payable,
         )
 
         result = {
-            'pintuan_obj': cls(pintuan_model_obj.id, pintuan_model_obj), 
+            'pintuan_obj': pintuan_obj, 
             'start_order_obj': order_obj
         }
         return result
+
     
+    def read(self):
+        self.__confirm_pintuan_model()
+        pintuan_info = {
+            'id': self.__model_obj.id,
+            'pintuan_sn': self.__model_obj.pintuan_sn,
+            'sku_id': self.__model_obj.sku_id,
+            'price': self.__model_obj.price,
+            'start_user_id': self.__model_obj.start_user_id,
+            'pintuan_status': self.__model_obj.pintuan_status,
+            'finish_time': self.__model_obj.finish_time,
+        }
+        return pintuan_info
+
+    
+    @classmethod
+    def get_pintuan_by_sn(cls, pintuan_sn):
+        try:
+            model_obj = PintuanModel.objects.get(pintuan_sn=pintuan_sn)
+            return cls(model_obj.pk, model_obj=model_obj)
+        except PintuanModel.DoesNotExist:
+            return None
+
     @property
     def success_order_number(self):
         return 0
@@ -86,7 +108,7 @@ class Pintuan(object):
         self.__confirm_pintuan_model()
         return self.__model_obj.price
     
-    def join(self, user_id, receiver, order_total_amount, order_amount_payable):
+    def join(self, entry, user_id, receiver, number, order_total_amount, order_amount_payable): 
         self.__confirm_pintuan_model()
         item_list = [{'sku_id': self.__model_obj.sku_id, 'number': 1}] 
          
