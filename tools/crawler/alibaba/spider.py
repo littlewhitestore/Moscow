@@ -2,7 +2,6 @@ import scrapy
 import json
 import re
 import os 
-import urllib2
 import requests
 
 DEFAULT_URLS_CONFIG = os.path.dirname(os.path.realpath(__file__)) + "/url.txt"
@@ -102,7 +101,7 @@ class Spider(scrapy.Spider):
 
         #parse detail
         detail_url = response.xpath("//div[@id='desc-lazyload-container']/@data-tfs-url").extract_first()
-        detail_response = urllib2.urlopen(detail_url).read()
+        detail_response = requests.get(detail_url).text
         detail_imgs = re.findall('src=\\\\"(\S+)\\\\"', detail_response.decode("GBK"))
 
         id = re.findall('/(\d+).html', response.url)[0]
