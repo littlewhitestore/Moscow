@@ -5,7 +5,7 @@ import os
 import urllib2
 import requests
 
-DEFAULT_URLS_CONFIG = os.path.dirname(os.path.realpath(__file__)) + "/1688.txt"
+DEFAULT_URLS_CONFIG = os.path.dirname(os.path.realpath(__file__)) + "/url.txt"
 def get_config_url(file=DEFAULT_URLS_CONFIG):
     configure = open(file, 'r').read()
     return configure.split('\n')
@@ -116,9 +116,3 @@ class Spider(scrapy.Spider):
         }
         upload(goods)
         return goods 
-
-
-
-if __name__ == "__main__":
-    goods = {'sku': [{'property_vector_str': u'\u989c\u8272|\u8fd0\u8d39\u8865\u5dee', 'price': 1.0, 'image_url': '', 'stock': 9702}, {'property_vector_str': u'\u989c\u8272|\u4e09\u89d2\u5dfe\u6253\u7248', 'price': 280.0, 'image_url': '', 'stock': 944}, {'property_vector_str': u'\u989c\u8272|\u5a74\u513f\u88c5', 'price': 300.0, 'image_url': '', 'stock': 999}], 'title': u'\u5a74\u513f\u670d\u9970 \u7eaf\u68c9\u4e09\u89d2\u5dfe\u5916\u8d38\u53e3\u6c34\u5dfe\u52a0\u5de5\u5b9a\u5236 \u6253\u7248\u94fe\u63a5 \u8fd0\u8d39\u8865\u5dee\u94fe\u63a5', 'url': 'https://detail.1688.com/offer/528705387116.html', 'cover': [u'https://cbu01.alicdn.com/img/ibank/2016/295/599/3011995592_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/557/236/3012632755_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/263/917/2868719362_1031861432.jpg'], 'detail': [u'https://cbu01.alicdn.com/img/ibank/2015/887/162/2561261788_1778072454.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/296/064/3013460692_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/703/333/3015333307_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/087/328/3012823780_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/053/723/3015327350_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/609/718/3012817906_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/805/364/3013463508_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/117/601/3076106711_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/480/415/3077514084_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/517/028/3012820715_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/478/423/3015324874_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/791/033/3015330197_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/879/123/3015321978_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/201/115/3077511102_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/480/535/3075535084_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/791/211/3076112197_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/777/466/3125664777_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/786/454/3124454687_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2015/053/459/2661954350_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2015/038/188/2657881830_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2015/720/069/2661960027_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2015/392/159/2661951293_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2015/621/711/2660117126_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2015/746/488/2657884647_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2015/370/759/2661957073_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2015/039/549/2661945930_1031861432.jpg', u'https://cbu01.alicdn.com/img/ibank/2016/384/515/2723515483_1031861432.jpg'], 'id': '1688:528705387116'}
-    upload(goods)
