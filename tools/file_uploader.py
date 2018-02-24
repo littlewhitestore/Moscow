@@ -4,6 +4,7 @@ import uuid
 import requests
 import ntpath
 import mimetypes
+import hashlib
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 
@@ -18,6 +19,23 @@ DEFAULT_QCLOUD = {
     'secret_key': '65t0xlYEnCQn2771nR3Ys18A2oT3Yy31',
     'region': 'ap-beijing',
 }
+
+
+class MD5TransparentFile:
+    def __init__(self, source):
+        self._sig = hashlib.md5()
+        self._source = source
+
+    def read(self, buffer):
+        try:
+            line = self._source.next()
+            self._sig.update(line)
+            return line
+        except StopIteration:
+            return b''
+
+    def hexdigest(self):
+        return self._sig.hexdigest()
 
 class BaseUploader(object):
     def upload_from_url(self, url):
@@ -48,6 +66,8 @@ class BaseUploader(object):
     def _upload_from_stream(self, steam, filename):
         raise Exception("NOT SUPPORT")
 
+
+
 class QCloudUploader(BaseUploader):
     @classmethod
     def from_default_config(cls):
@@ -68,7 +88,7 @@ class QCloudUploader(BaseUploader):
         except Exception, e:
             content_type = DEFAULT_MIME_TYPE
 
-        object_key = "%s"%str(hash(stream))
+        object_key = self._generate_key(stream)
         bucket = self._generate_bucket(object_key)
 
         #TODO setting content-type
@@ -84,6 +104,11 @@ class QCloudUploader(BaseUploader):
             uploaded_url = self._generate_public_url(object_key, DEFAULT_EXPIRE_TIME)
             return uploaded_url
         return None
+
+    def _generate_key(self, stream):
+        t = MD5TransparentFile(stream)
+        key = t.hexdigest()
+        return key
 
     def _generate_bucket(self, key):
         BUCKET_SIZE = 16 
