@@ -1,12 +1,17 @@
-import scrapy
 import json
 import re
 import os 
 import requests
+
 from tools.file_uploader import QCloudUploader
+from tools.crawler.base import BaseSpider
 
 
 DEFAULT_URLS_CONFIG = os.path.dirname(os.path.realpath(__file__)) + "/url.txt"
+HOST = "https://www.xiaobaidiandev.com"
+UPLOAD_GOODS_URL = HOST + "/api/goods/upload"
+UPLOAD_SKU_URL = HOST + "/api/goods/{goods_id}/sku/upload"
+
 def get_config_url(file=DEFAULT_URLS_CONFIG):
     configure = open(file, 'r').read()
     return configure.split('\n')
@@ -14,31 +19,30 @@ def get_config_url(file=DEFAULT_URLS_CONFIG):
 def price(original_price):
     return original_price * 100
 
-def upload_images(images):
+def upload_to_qcloud(images):
     upr = QCloudUploader.from_default_config()
-    new_images = []
+    new_image_keys = []
     for image_url in images:
-        new_url = upr.upload_from_url(image_url)
-        new_images.append(new_url)
-    return new_images
+        object_key = upr.upload_from_url(image_url)
+        new_image_keys.append(object_key)
+    return new_image_keys
 
 def upload(goods):
-    #https://github.com/littlewhitestore/Moscow/wiki/7.%E5%95%86%E5%93%81%E4%B8%8A%E4%BC%A0
-    HOST = "https://www.xiaobaidiandev.com"
-    UPLOAD_GOODS_URL = HOST + "/api/goods/upload"
-    UPLOAD_SKU_URL = HOST + "/api/goods/{goods_id}/sku/upload"
     headers = {'content-type': 'application/json'}
     min_price = min(sku['price'] for sku in goods['sku'])
+    banner_image_keys = upload_to_qcloud(goods['cover'])
+    detail_image_keys = upload_to_qcloud(goods['detail'])
     payload = {
-        'banner_images': ";".join(upload_images(goods['cover'])),
+        'banner_images': ";".join(banner_image_keys),
         'name': goods['title'],
         'market_price': min_price,
         'price': price(min_price),
-        'detail_images': ";".join(upload_images(goods['detail'])),
+        'detail_images': ";".join(detail_image_keys),
         'supply_source': goods['id'].split(':')[0],
         'supply_item_id': goods['id'].split(':')[1]
     }
     r = requests.post(UPLOAD_GOODS_URL, data=json.dumps(payload), headers=headers)
+    assert r.status_code == 200
     rj = json.loads(r.text)
     goods_id = rj['data']['goods_id']
 
@@ -52,10 +56,10 @@ def upload(goods):
             'stock': sku['stock'],
         }
         r = requests.post(UPLOAD_SKU_URL.format(goods_id=goods_id), data=json.dumps(payload), headers=headers)
-        print r
+        assert r.status_code == 200
 
 
-class Spider(scrapy.Spider):
+class Spider(BaseSpider):
     name = '1688'
     start_urls = get_config_url() 
 

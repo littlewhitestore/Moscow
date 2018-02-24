@@ -1,4 +1,6 @@
+import logging
 from scrapy.crawler import CrawlerProcess
+from scrapy.utils.log import configure_logging
 
 from tools.crawler.alibaba.spider import Spider as SpiderAlibaba
 
@@ -10,6 +12,9 @@ SPIDERS = {
 
 
 def crawl(supply):
+    configure_logging(install_root_handler=False)
+    logging.basicConfig(level=logging.INFO)
+
     process = CrawlerProcess({
         'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
     })
