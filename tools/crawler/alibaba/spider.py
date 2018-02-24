@@ -3,6 +3,8 @@ import json
 import re
 import os 
 import requests
+from tools.file_uploader import QCloudUploader
+
 
 DEFAULT_URLS_CONFIG = os.path.dirname(os.path.realpath(__file__)) + "/url.txt"
 def get_config_url(file=DEFAULT_URLS_CONFIG):
@@ -12,6 +14,14 @@ def get_config_url(file=DEFAULT_URLS_CONFIG):
 def price(original_price):
     return original_price * 100
 
+def upload_images(images):
+    upr = QCloudUploader.from_default_config()
+    new_images = []
+    for image_url in images:
+        new_url = upr.upload_from_url(image_url)
+        new_images.append(new_url)
+    return new_images
+
 def upload(goods):
     #https://github.com/littlewhitestore/Moscow/wiki/7.%E5%95%86%E5%93%81%E4%B8%8A%E4%BC%A0
     HOST = "https://www.xiaobaidiandev.com"
@@ -20,11 +30,11 @@ def upload(goods):
     headers = {'content-type': 'application/json'}
     min_price = min(sku['price'] for sku in goods['sku'])
     payload = {
-        'banner_images': ";".join(goods['cover']),
+        'banner_images': ";".join(upload_images(goods['cover'])),
         'name': goods['title'],
         'market_price': min_price,
         'price': price(min_price),
-        'detail_images': ";".join(goods['detail']),
+        'detail_images': ";".join(upload_images(goods['detail'])),
         'supply_source': goods['id'].split(':')[0],
         'supply_item_id': goods['id'].split(':')[1]
     }
@@ -99,10 +109,16 @@ class Spider(scrapy.Spider):
             }
             sku.append(item) 
 
+
         #parse detail
         detail_url = response.xpath("//div[@id='desc-lazyload-container']/@data-tfs-url").extract_first()
-        detail_response = requests.get(detail_url).text
-        detail_imgs = re.findall('src=\\\\"(\S+)\\\\"', detail_response.decode("GBK"))
+        detail_response = requests.get(detail_url)
+        try:
+            detail_text = detail_response.text.decode(detail_response.encoding)
+        except Exception, e:
+            detail_text = detail_response.text.decode("utf8")
+
+        detail_imgs = re.findall('src=\\\\"(\S+)\\\\"', detail_text)
 
         id = re.findall('/(\d+).html', response.url)[0]
         goods = {
