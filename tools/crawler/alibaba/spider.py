@@ -12,6 +12,7 @@ HOST = "https://www.xiaobaidiandev.com"
 UPLOAD_GOODS_URL = HOST + "/api/goods/upload"
 UPLOAD_SKU_URL = HOST + "/api/goods/{goods_id}/sku/upload"
 
+
 def get_config_url(file=DEFAULT_URLS_CONFIG):
     configure = open(file, 'r').read()
     return configure.split('\n')
@@ -21,6 +22,9 @@ def price(original_price):
 
 def upload_to_qcloud(images):
     upr = QCloudUploader.from_default_config()
+    if isinstance(images, basestring):
+        return upr.upload_from_url(images)
+
     new_image_keys = []
     for image_url in images:
         object_key = upr.upload_from_url(image_url)
@@ -50,7 +54,7 @@ def upload(goods):
     for sku in goods['sku']:
         headers = {'content-type': 'application/json'}
         payload = {
-            'image_url': sku['image_url'],
+            'image_url': upload_to_qcloud(sku['image_url']),
             'price': price(sku['price']),
             'property_vector_str': sku['property_vector_str'],
             'stock': sku['stock'],
@@ -62,6 +66,83 @@ def upload(goods):
 class Spider(BaseSpider):
     name = '1688'
     start_urls = get_config_url() 
+
+    def parse_sku(self, response):
+        def parse_from_js_variable(response):
+            sku_html = ""
+            sku_html = re.findall("var iDetailData =(.+?);\n", response.body.decode("GBK"), re.S)[0].replace("\n", "").replace("\t", "")
+            sku_json = json.loads(sku_html)
+            sku_props = sku_json['sku']['skuProps']
+            if len(sku_props) == 0:
+                raise Exception("ERROR SKU PROP, IT'S EMPTY:%s"%response.url)
+            sku_image_map = {prop['name']:prop.get('imageUrl', "") for prop in sku_props[0]['value']}
+            sku_prop_map = {}
+            for i in range(0, len(sku_props)):
+                for item in sku_props[i]['value']:
+                    k = item['name']
+                    v = sku_props[i]['prop']
+                    sku_prop_map[k] = v
+
+            sku = []
+            for k, v in sku_json['sku']['skuMap'].items():
+                prop_0 = k.split('&gt;')[0]
+                image_url = sku_image_map[prop_0] 
+                prop = "|".join(["%s|%s"%(sku_prop_map[p], p) for p in k.split('&gt;')])
+                stock = v['canBookCount']
+
+                price = v.get('price', None)
+                try:
+                    if price == None:
+                        #eg: https://detail.1688.com/offer/42635693272.html
+                        range_price = [p[1] for p in sku_json['sku']['priceRange']]
+                        price = max(range_price)
+                except Exception, e:
+                    pass
+
+                price = float(price)
+
+                item = {
+                    "image_url": image_url,
+                    "price": price,
+                    "property_vector_str": prop,
+                    "stock": stock 
+                }
+                sku.append(item) 
+            return sku
+
+        def parse_from_html(response):
+            #eg: https://detail.1688.com/offer/539856059524.html?spm=a2615.7691456.0.0.2e267faatnB9jV
+            sku = []
+            sku_html = response.xpath("//div[contains(@class,'mod-detail-purchasing')]/@data-mod-config").extract_first()
+            sku_json = json.loads(sku_html)
+            stock = float(sku_json['max'])
+
+            range_price = response.xpath("//span[contains(@class, 'price-length-4')]/text()").extract()
+            range_price = [float(p) for p in range_price]
+            price = max(range_price)
+
+            item = {
+                "image_url": "",
+                "price": price,
+                "property_vector_str": "",
+                "stock": stock 
+            }
+            sku.append(item) 
+            return sku
+
+        try:
+            sku = parse_from_js_variable(response)
+        except Exception, e:
+            sku = []
+
+        if len(sku) == 0:
+            try:
+                sku = parse_from_html(response)
+            except Exception, e:
+                sku = []
+
+        return sku
+
 
     def parse(self, response):
         #parse title
@@ -75,44 +156,7 @@ class Spider(BaseSpider):
             cover_imgs.append(img)
 
         #parse sku
-        sku_html = ""
-        sku_html = re.findall("var iDetailData =(.+?);\n", response.body.decode("GBK"), re.S)[0].replace("\n", "").replace("\t", "")
-        sku_json = json.loads(sku_html)
-        sku_props = sku_json['sku']['skuProps']
-        if len(sku_props) == 0:
-            raise Exception("ERROR SKU PROP, IT'S EMPTY:%s"%response.url)
-        sku_image_map = {prop['name']:prop.get('imageUrl', "") for prop in sku_props[0]['value']}
-        sku_prop_map = {}
-        for i in range(0, len(sku_props)):
-            for item in sku_props[i]['value']:
-                k = item['name']
-                v = sku_props[i]['prop']
-                sku_prop_map[k] = v
-
-        sku = []
-        for k, v in sku_json['sku']['skuMap'].items():
-            prop_0 = k.split('&gt;')[0]
-            image_url = sku_image_map[prop_0] 
-            prop = "|".join(["%s|%s"%(sku_prop_map[p], p) for p in k.split('&gt;')])
-            stock = v['canBookCount']
-
-            price = v.get('price', None)
-            if price == None:
-                #if price is between a range
-                #using the max price
-                #eg: https://detail.1688.com/offer/42635693272.html
-                range_price = [p[1] for p in sku_json['sku']['priceRange']]
-                price = max(range_price)
-            price = float(price)
-
-            item = {
-                "image_url": image_url,
-                "price": price,
-                "property_vector_str": prop,
-                "stock": stock 
-            }
-            sku.append(item) 
-
+        sku = self.parse_sku(response)
 
         #parse detail
         detail_url = response.xpath("//div[@id='desc-lazyload-container']/@data-tfs-url").extract_first()
