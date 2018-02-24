@@ -68,12 +68,9 @@ class QCloudUploader(BaseUploader):
         except Exception, e:
             content_type = DEFAULT_MIME_TYPE
 
-        #generate a random uuid
-        #althougt key is same
-        #but get two diff url
-        object_key = "%s"%(str(uuid.uuid4()))
-
+        object_key = "%s"%str(hash(stream))
         bucket = self._generate_bucket(object_key)
+
         #TODO setting content-type
         response = self.upload_client.put_object(
             Bucket=bucket,
