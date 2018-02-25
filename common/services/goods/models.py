@@ -23,6 +23,8 @@ class GoodsSkuModel(models.Model):
     image_url = models.CharField(max_length=1024, default='')
     property_vector = models.CharField(max_length=512, default='')
     price = models.IntegerField(null=False, db_index=True)
+    pintuan_price = models.IntegerField(null=False, db_index=True)
+    supply_cost= models.IntegerField(null=False, db_index=True)
     stock = models.IntegerField(null=False, db_index=True)
     status = models.IntegerField(null=False, db_index=True)
     created_time = models.DateTimeField(auto_now_add=True)

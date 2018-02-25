@@ -137,7 +137,7 @@ class Goods(object):
         return cls(goods_id)
             
 
-    def add_sku(self, image_url, property_vector, price, stock=0, status=SkuStatus.NORMAL):
+    def add_sku(self, property_vector, price, image_url='', pintuan_price=-1, supply_cost=-1, stock=0, status=SkuStatus.NORMAL):
         self.__confirm_goods_sku_model_dict()
         for obj in self.__goods_sku_model_dict.values():
             if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
@@ -148,6 +148,8 @@ class Goods(object):
             image_url=image_url,
             property_vector=json.dumps(property_vector),
             price=price,
+            pintuan_price=pintuan_price,
+            supply_cost=supply_cost,
             stock=stock,
             status=status
         )
