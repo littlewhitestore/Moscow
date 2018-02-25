@@ -20,7 +20,7 @@ class GoodsModel(models.Model):
 class GoodsSkuModel(models.Model):
     id = models.AutoField(primary_key=True)
     goods_id = models.IntegerField(null=False, db_index=True)
-    image_url = models.CharField(max_length=1024, default='')
+    image_key = models.CharField(max_length=64, default='')
     property_vector = models.CharField(max_length=512, default='')
     price = models.IntegerField(null=False, db_index=True)
     pintuan_price = models.IntegerField(null=False, db_index=True)
@@ -36,7 +36,7 @@ class GoodsSkuModel(models.Model):
 class GoodsBannerImageModel(models.Model):
     id = models.AutoField(primary_key=True)
     goods_id = models.IntegerField(null=False, db_index=True)
-    url = models.CharField(max_length=1024, default='')
+    image_key = models.CharField(max_length=64, default='')
     sort = models.IntegerField(null=False, db_index=True)
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
@@ -48,7 +48,7 @@ class GoodsBannerImageModel(models.Model):
 class GoodsDetailImageModel(models.Model):
     id = models.AutoField(primary_key=True)
     goods_id = models.IntegerField(null=False, db_index=True)
-    url = models.CharField(max_length=1024, default='')
+    image_key = models.CharField(max_length=64, default='')
     sort = models.IntegerField(null=False, db_index=True)
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)

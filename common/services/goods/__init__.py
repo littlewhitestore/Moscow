@@ -6,6 +6,7 @@ import hashlib
 
 from .models import GoodsModel, GoodsBannerImageModel, GoodsDetailImageModel, GoodsSkuModel
 from common.services.base import StatusBase
+from common.utils import ImageStorage
 
 class GoodsStatus(StatusBase):
     FREEZED = 0
@@ -48,13 +49,15 @@ class Goods(object):
         if self.__goods_banner_image_list == None:
             self.__goods_banner_image_list = []
             for obj in GoodsBannerImageModel.objects.filter(goods_id=self.id).order_by('sort'):
-                self.__goods_banner_image_list.append(obj.url)
+                image_url = ImageStorage.get_url_by_key(obj.image_key)
+                self.__goods_banner_image_list.append(image_url)
 
     def __confirm_goods_detail_image_model(self):
         if self.__goods_detail_image_list == None:
             self.__goods_detail_image_list = []
             for obj in GoodsDetailImageModel.objects.filter(goods_id=self.id).order_by('sort'):
-                self.__goods_detail_image_list.append(obj.url)
+                image_url = ImageStorage.get_url_by_key(obj.image_key)
+                self.__goods_detail_image_list.append(image_url)
     
     def __confirm_goods_sku_model_dict(self):
         if self.__goods_sku_model_dict == None:
@@ -137,7 +140,7 @@ class Goods(object):
         return cls(goods_id)
             
 
-    def add_sku(self, property_vector, price, image_url='', pintuan_price=-1, supply_cost=-1, stock=0, status=SkuStatus.NORMAL):
+    def add_sku(self, property_vector, price, image_key='', pintuan_price=-1, supply_cost=-1, stock=0, status=SkuStatus.NORMAL):
         self.__confirm_goods_sku_model_dict()
         for obj in self.__goods_sku_model_dict.values():
             if self.__is_property_vector_conflict(property_vector, json.loads(obj.property_vector)):
@@ -145,7 +148,7 @@ class Goods(object):
         
         obj = GoodsSkuModel(
             goods_id=self.id,
-            image_url=image_url,
+            image_key=image_key,
             property_vector=json.dumps(property_vector),
             price=price,
             pintuan_price=pintuan_price,
@@ -194,7 +197,7 @@ class Goods(object):
             'goods_id': self.id, 
             'goods_name': self.__goods_model_obj.name,
             'price': sku_obj.price, 
-            'image_url': sku_obj.image_url, 
+            'image_url': ImageStorage.get_url_by_key(sku_obj.image_key), 
             'property': self.__serialize_sku_property_vector(sku_obj.property_vector), 
         }
         return sku_info
@@ -206,8 +209,9 @@ class Goods(object):
         for sku in sorted(self.__goods_sku_model_dict.values(), key=lambda x: x.created_time):
             sku_list.append({
                 'id': sku.id,
-                'image_url': sku.image_url,
+                'image_url': ImageStorage.get_url_by_key(sku.image_key),
                 'property_vector': json.loads(sku.property_vector),
+                'property': self.__serialize_sku_property_vector(sku.property_vector),
                 'price': sku.price,
                 'stock': sku.stock,
             })
@@ -238,10 +242,10 @@ class Goods(object):
     def update_banner_image_list(self, banner_image_list):
         GoodsBannerImageModel.objects.filter(goods_id=self.id).delete()
         sort = 1
-        for image_url in banner_image_list:
+        for image_key in banner_image_list:
             image_obj = GoodsBannerImageModel(
                 goods_id=self.id,
-                url=image_url,
+                image_key=image_key,
                 sort=sort
             )
             image_obj.save()
@@ -251,10 +255,10 @@ class Goods(object):
     def update_detail_image_list(self, detail_image_list):
         GoodsDetailImageModel.objects.filter(goods_id=self.id).delete()
         sort = 1
-        for image_url in detail_image_list:
+        for image_key in detail_image_list:
             image_obj = GoodsDetailImageModel(
                 goods_id=self.id,
-                url=image_url,
+                image_key=image_key,
                 sort=sort
             )
             image_obj.save()

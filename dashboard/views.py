@@ -97,7 +97,7 @@ class GoodsSkuUpload(views.APIView):
                 i += 2
         
         
-        image_url = request.data.get('image_url', '')
+        image_key = request.data.get('image_key', '')
         price = request.data.get('price', None)
         if price == None:
             raise Exception("Without price!!!")
@@ -108,7 +108,7 @@ class GoodsSkuUpload(views.APIView):
         
         goods_obj = Goods(goods_id)
         sku_id = goods_obj.add_sku(
-            image_url=image_url,
+            image_key=image_key,
             property_vector=property_vector, 
             price=price,
             pintuan_price=pintuan_price,
