@@ -74,9 +74,9 @@ class ImageStorage(object):
             Bucket=bucket,
             Body=stream,
             Key=object_key,
-            StorageClass='STANDARD',
-            CacheControl='no-cache',
-            ContentDisposition=file
+            Metadata={
+                'x-cos-acl': "public-read",
+            }
         )
         if response:
             return object_key
@@ -97,19 +97,11 @@ class ImageStorage(object):
         return bucket
 
     @staticmethod
-    def get_url_by_key(key, expired=None):
-        if expired == None:
-            expired=ImageStorage.DEFAULT_EXPIRE_TIME
-
+    def get_url_by_key(key):
         bucket = ImageStorage.get_bucket_by_key(key)
-        config = CosConfig(
-            Region=ImageStorage.QCLOUD_CONFIG['region'], 
-            Secret_id=ImageStorage.QCLOUD_CONFIG['secret_id'], 
-            Secret_key=ImageStorage.QCLOUD_CONFIG['secret_key'], 
-            Token=''
-        )
-        upload_client = CosS3Client(config)
-        return upload_client.get_presigned_download_url(bucket, key, expired)
+        PUBLIC_READ_URL = "http://{bucket}.cos.{region}.myqcloud.com/{key}"
+        url = PUBLIC_READ_URL.format(bucket=bucket, region=ImageStorage.QCLOUD_CONFIG['region'], key=key)
+        return url 
 
         
 
