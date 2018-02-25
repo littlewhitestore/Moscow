@@ -9,8 +9,8 @@ from tools.crawler.base import BaseSpider
 
 DEFAULT_URLS_CONFIG = os.path.dirname(os.path.realpath(__file__)) + "/url.txt"
 HOST = "https://www.xiaobaidiandev.com"
-UPLOAD_GOODS_URL = HOST + "/api/goods/upload"
-UPLOAD_SKU_URL = HOST + "/api/goods/{goods_id}/sku/upload"
+UPLOAD_GOODS_URL = HOST + "/dashboard/goods/upload"
+UPLOAD_SKU_URL = HOST + "/dashboard/goods/{goods_id}/sku/upload"
 
 
 def get_config_url(file=DEFAULT_URLS_CONFIG):
@@ -53,7 +53,7 @@ def upload(goods):
     for sku in goods['sku']:
         headers = {'content-type': 'application/json'}
         payload = {
-            'image_url': upload_to_qcloud(sku['image_url']),
+            'image_key': upload_to_qcloud(sku['image_url']),
             'price': price(sku['price']),
             'property_vector_str': sku['property_vector_str'],
             'stock': sku['stock'],
