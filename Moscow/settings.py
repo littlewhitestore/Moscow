@@ -136,6 +136,12 @@ STATICFILES_DIRS = [
 
 
 ENTRY_CONFIG = {
+    'london': {
+        'WECHAT_APP_ID': 'wx69b1df2db40d33f5',
+        'WECHAT_APP_SECRET': 'c7003b84d2a85598ce4e051d2f76706e',
+        'WXPAY_MCH_ID': '1495032292',
+        'WXPAY_API_KEY': 'aWNhdGUgQXV0aG9yXR5Q0wwYDVQQDEwR'
+    },
     'paris': {
         'WECHAT_APP_ID': 'wxd4eae843e18ff7da',
         'WECHAT_APP_SECRET': '510861ca183551e3a7fcbdc87573c00f',
