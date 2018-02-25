@@ -14,7 +14,7 @@ from qcloud_cos import CosS3Client
 
 
 class ImageStorage(object):
-    BUCKET_SIZE = 16
+    BUCKET_SIZE = 4 
     BUCKET_FORMAT = "img-prod1-{:0>3d}-1255633922"
     QCLOUD_CONFIG = {
         'secret_id': 'AKIDjOTO9qnlxyoBe2aJB2vmTzKVYVL5m6NT',
@@ -91,7 +91,7 @@ class ImageStorage(object):
     
     @staticmethod
     def get_bucket_by_key(key):
-        prefix = int(key[:1], ImageStorage.BUCKET_SIZE)
+        prefix = int(key[:1], 16) % ImageStorage.BUCKET_SIZE
         bucket = ImageStorage.BUCKET_FORMAT.format(prefix)
         return bucket
 

@@ -47,7 +47,7 @@ def upload(goods):
     r = requests.post(UPLOAD_GOODS_URL, data=json.dumps(payload), headers=headers)
     assert r.status_code == 200
     rj = json.loads(r.text)
-    goods_id = rj['data']['goods_id']
+    goods_id = rj['goods_id']
 
 
     for sku in goods['sku']:
