@@ -14,6 +14,7 @@ class OrderModel(models.Model):
     amount_payable = models.IntegerField(default=0)
     order_status = models.IntegerField(default=0, db_index=True)
     pintuan_id = models.IntegerField(default=-1, db_index=True)
+    pintuan_sn = models.CharField(max_length=32, default='', db_index=True)
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
 
@@ -99,6 +100,7 @@ class OrderLogisticsModel(models.Model):
 
 class PintuanModel(models.Model):
     id = models.AutoField(primary_key=True)
+    pintuan_sn = models.CharField(max_length=32, unique=True, db_index=True)
     sku_id = models.IntegerField()
     price = models.IntegerField(null=False, db_index=True)
     success_target = models.IntegerField(default=0)

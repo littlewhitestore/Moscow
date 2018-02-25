@@ -139,6 +139,7 @@ class Migration(migrations.Migration):
                 ('amount_payable', models.IntegerField(default=0)),
                 ('order_status', models.IntegerField(db_index=True, default=0)),
                 ('pintuan_id', models.IntegerField(db_index=True, default=-1)),
+                ('pintuan_sn', models.CharField(db_index=True, default='', max_length=32)),
                 ('created_time', models.DateTimeField(auto_now_add=True)),
                 ('updated_time', models.DateTimeField(auto_now=True)),
             ],
@@ -186,6 +187,7 @@ class Migration(migrations.Migration):
             name='PintuanModel',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('pintuan_sn', models.CharField(db_index=True, max_length=32, unique=True)),
                 ('sku_id', models.IntegerField()),
                 ('price', models.IntegerField(db_index=True)),
                 ('success_target', models.IntegerField(default=0)),
