@@ -24,17 +24,9 @@ DEFAULT_QCLOUD = {
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 class MD5TransparentFile:
-    def __init__(self, source):
+    def __init__(self, content):
         self._sig = hashlib.md5()
-        self._source = source
-
-    def read(self, buffer):
-        try:
-            line = self._source.next()
-            self._sig.update(line)
-            return line
-        except StopIteration:
-            return b''
+        self._sig.update(content)
 
     def hexdigest(self):
         return self._sig.hexdigest()
@@ -124,9 +116,21 @@ class QCloudUploader(BaseUploader):
 if __name__ == "__main__":
     upr = QCloudUploader.from_default_config()
     org_url = "https://www.microsoft.com/zh-hk/CMSImages/WindowsHello_Poster_1920-1600x300-hello.png?version=0d8f51c7-ef87-b0af-8f26-453fb40b4b7d"
-    key = upr.upload_from_url(org_url)
-    new_url = upr.generate_public_url(key)
-    print new_url
-    assert new_url
-    assert org_url != new_url
-    assert "myqcloud.com" in new_url
+    urls = [
+        "https://www.microsoft.com/zh-hk/CMSImages/WindowsHello_Poster_1920-1600x300-hello.png?version=0d8f51c7-ef87-b0af-8f26-453fb40b4b7d",
+        "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1519547364079&di=b1a7381c8478b739d75aa52b5f394063&imgtype=0&src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fwallpaper%2F1207%2F16%2Fc0%2F12347883_1342409469170.jpg"
+    ]
+    def upload(org_url):
+        key = upr.upload_from_url(org_url)
+        new_url = upr.generate_public_url(key)
+        assert new_url
+        assert org_url != new_url
+        assert "myqcloud.com" in new_url
+        return new_url
+
+    new_urls = set()
+    for url in urls:
+        new_url = upload(url)
+        print new_url
+        new_urls.add(new_url)
+    assert len(new_urls) == len(urls)
