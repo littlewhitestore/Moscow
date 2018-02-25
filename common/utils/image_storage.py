@@ -15,11 +15,11 @@ from qcloud_cos import CosS3Client
 
 class ImageStorage(object):
     BUCKET_SIZE = 16
-    BUCKET_FORMAT = "img-prod-{:0>3d}-1255633922"
+    BUCKET_FORMAT = "img-prod1-{:0>3d}-1255633922"
     QCLOUD_CONFIG = {
         'secret_id': 'AKIDjOTO9qnlxyoBe2aJB2vmTzKVYVL5m6NT',
         'secret_key': '65t0xlYEnCQn2771nR3Ys18A2oT3Yy31',
-        'region': 'ap-beijing',
+        'region': 'ap-shanghai',
     }
 
     @staticmethod
