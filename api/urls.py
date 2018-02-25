@@ -2,9 +2,7 @@ from django.conf.urls import include, url
 import views
 
 urlpatterns = [
-    url(r'^goods/upload$', views.GoodsUpload.as_view()),
     url(r'^goods/(?P<goods_id>\d+)/detail$', views.GoodsDetail.as_view()),
-    url(r'^goods/(?P<goods_id>\d+)/sku/upload$', views.GoodsSkuUpload.as_view()),
     url(r'^helloworld$', views.HelloWorld.as_view()),
     url(r'^home$', views.Home.as_view()),
     url(r'^home/banner/upload$', views.HomeBannerUpload.as_view()),
