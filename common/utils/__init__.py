@@ -2,8 +2,11 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+import hashlib
 import pytz
 import time
+
+from image_storage import ImageStorage
 
 def _append_tz(t):
     tz = pytz.timezone(settings.TIME_ZONE)
