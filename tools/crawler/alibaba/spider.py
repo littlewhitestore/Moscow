@@ -3,7 +3,7 @@ import re
 import os 
 import requests
 
-from tools.file_uploader import QCloudUploader
+from common.utils import ImageStorage
 from tools.crawler.base import BaseSpider
 
 
@@ -21,13 +21,12 @@ def price(original_price):
     return original_price * 100
 
 def upload_to_qcloud(images):
-    upr = QCloudUploader.from_default_config()
     if isinstance(images, basestring):
-        return upr.upload_from_url(images)
+        return ImageStorage.upload_from_url(images)
 
     new_image_keys = []
     for image_url in images:
-        object_key = upr.upload_from_url(image_url)
+        object_key = ImageStorage.upload_from_url(image_url)
         new_image_keys.append(object_key)
     return new_image_keys
 
